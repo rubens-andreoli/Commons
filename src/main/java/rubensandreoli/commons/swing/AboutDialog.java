@@ -252,9 +252,9 @@ public class AboutDialog extends javax.swing.JDialog {
     public AboutDialog addAtribution(String item, String creator, String site){
         if(atributions == null) atributions = new StringBuilder();
         else atributions.append("<br/>");
-        atributions.append("<span style=\"font-size:9px;\">")
+        atributions.append("<span style=\"font-size:9px;\">&#8226; ")
                 .append(item).append(" made by <b>").append(creator)
-                .append("</b> from <i>").append(site).append("</i></span>");
+                .append("</b> at:<br/><i>").append(site).append("</i></span>");
         return this;
     }
     

@@ -30,7 +30,7 @@ public class SwingUtils {
     
     private SwingUtils(){}
     
-    public static void addClickableLink(String url, Component c, boolean log){
+    public static void addClickableLink(String url, Component c, boolean logExceptions){
         c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         c.addMouseListener(new MouseAdapter() {
             @Override
@@ -50,7 +50,7 @@ public class SwingUtils {
                     } catch (IOException ex) {exception = ex;}
                 }
 
-                if(exception != null && log) Logger.log.print(Level.WARNING, "failed opening donate link on "+os, exception);
+                if(exception != null && logExceptions) Logger.log.print(Level.WARNING, "failed opening link on "+os, exception);
             }
         });
     }
