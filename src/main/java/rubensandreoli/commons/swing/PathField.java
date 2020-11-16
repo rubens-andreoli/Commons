@@ -19,18 +19,9 @@
 package rubensandreoli.commons.swing;
 
 import java.awt.Component;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import javax.swing.JFileChooser;
-import rubensandreoli.commons.others.Level;
-import rubensandreoli.commons.others.Logger;
 import rubensandreoli.commons.utils.FileUtils;
+import rubensandreoli.commons.utils.SwingUtils;
 
 /** 
  * References:
@@ -49,15 +40,14 @@ import rubensandreoli.commons.utils.FileUtils;
 public class PathField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
     
-    public static final int FILES_ONLY = JFileChooser.FILES_ONLY;
-    public static final int DIRECTORIES_ONLY = JFileChooser.DIRECTORIES_ONLY;
-    public static final int FILES_AND_DIRECTORIES = JFileChooser.FILES_AND_DIRECTORIES;
+    public static final int FILES_ONLY = SwingUtils.FILES_ONLY;
+    public static final int DIRECTORIES_ONLY = SwingUtils.DIRECTORIES_ONLY;
+    public static final int FILES_AND_DIRECTORIES = SwingUtils.FILES_AND_DIRECTORIES;
     public static final int MIN_LENGTH = FileUtils.MASKED_FILENAME_MIN_LENGTH;
     
     private final int mode;
     private File file;
     private int length;
-    private static JFileChooser chooser = new JFileChooser();;
     
     public PathField(int mode, int length){
         this.mode = mode;
@@ -75,20 +65,7 @@ public class PathField extends javax.swing.JTextField{
     }
     
     private void enableDrag(){
-        setDropTarget(new DropTarget() {
-            @Override
-            public synchronized void drop(DropTargetDropEvent evt) {
-                try {
-                    evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    final List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for (File file : droppedFiles) {
-                        if(setText(file)) break;
-                    }
-                } catch (UnsupportedFlavorException | IOException ex) {
-                    Logger.log.print(Level.SEVERE, "drag and drop failed", ex);
-                }
-            }
-        });
+        SwingUtils.addDroppable(this, file -> setText(file), true);
     }
 
     public void clear(){
@@ -131,7 +108,7 @@ public class PathField extends javax.swing.JTextField{
             }
         }
         
-        chooser.setSelectedFile(new File(file, File.separator));
+        SwingUtils.getChooser(mode).setSelectedFile(new File(file, File.separator));
         super.setText(FileUtils.maskPathname(file.getPath(), length));
         this.file = file;
         fireActionPerformed();
@@ -145,21 +122,7 @@ public class PathField extends javax.swing.JTextField{
     }
 
     public boolean select(Component parent){
-        return setText(selectFile(parent, mode), true);
-    }
-    
-    public static File selectFile(Component parent, int mode){
-        chooser.setFileSelectionMode(mode);
-        if(chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION){
-            File selectedFile = chooser.getSelectedFile();
-            return selectedFile;
-        }
-        return null;
-    }
-    
-    public static String select(Component parent, int mode){
-        final File selected = selectFile(parent, mode);
-        return selected==null? null : selected.getPath();
+        return setText(SwingUtils.selectFile(parent, mode), true);
     }
 
 }

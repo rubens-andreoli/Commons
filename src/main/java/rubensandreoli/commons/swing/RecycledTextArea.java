@@ -69,7 +69,6 @@ public class RecycledTextArea extends javax.swing.JTextArea{
         });
     }
   
-
     public RecycledTextArea() {
         this(DEFAULT_MAX_SIZE);
     }

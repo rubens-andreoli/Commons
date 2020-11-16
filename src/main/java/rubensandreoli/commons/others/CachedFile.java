@@ -104,7 +104,7 @@ public class CachedFile extends File{ //TODO: implement all methods
     }
     
     public String getExtension() {
-        if(extension == null) name = FileUtils.getExtension(super.getPath());
+        if(extension == null) extension = FileUtils.getExtension(super.getPath());
         return extension;
     }
     
@@ -143,6 +143,10 @@ public class CachedFile extends File{ //TODO: implement all methods
     
     public void setContent(byte[] content) {
         this.content = content;
+    }
+    
+    public void freeContent(){
+        content = null;
     }
     // </editor-fold>
 

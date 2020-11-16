@@ -28,8 +28,8 @@ public class Logger {
 
     public static final String FILENAME = "crash.log";
     
-    private static final String SEPARATOR_MASK = "-------------//----------------";
-    private static final String LOG_MASK = "[%s]\r\ndate: %s\r\ncomment: %s\r\nmessage: %s\r\nstack trace: %s\r\n"+SEPARATOR_MASK+"\r\n";
+    private static final String SEPARATOR = "-------------//----------------";
+    private static final String LOG_MASK = "[%s]\r\ndate: %s\r\ncomment: %s\r\nmessage: %s\r\nstack trace: %s\r\n"+SEPARATOR+"\r\n";
     private static final File FILE = new File(FILENAME);
     
     public static final Logger log = new Logger(); //eager initialization;
@@ -42,11 +42,11 @@ public class Logger {
         if(!enabled) return;
         final StringBuilder trace = new StringBuilder();
         for (StackTraceElement e : ex.getStackTrace()) {
-            trace.append(e.toString()).append("\n");
+            trace.append(e.toString()).append("\r\n");
         }
         try(var bw = new BufferedWriter(new FileWriter(FILE, true))){
             bw.write(String.format(LOG_MASK, lvl.toString(), LocalDateTime.now(), comment, ex.getMessage(), trace));
-        } catch (IOException ex1) {}
+        } catch (IOException e) {}
     }
     
     public void print(Level lvl, Exception ex){

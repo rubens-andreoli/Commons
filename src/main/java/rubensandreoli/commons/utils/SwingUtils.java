@@ -20,15 +20,63 @@ package rubensandreoli.commons.utils;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.function.Function;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import rubensandreoli.commons.others.Level;
 import rubensandreoli.commons.others.Logger;
 
 public class SwingUtils {
     
+    public static final int FILES_ONLY = JFileChooser.FILES_ONLY;
+    public static final int DIRECTORIES_ONLY = JFileChooser.DIRECTORIES_ONLY;
+    public static final int FILES_AND_DIRECTORIES = JFileChooser.FILES_AND_DIRECTORIES;
+    
+    private static JFileChooser chooser;
+    
     private SwingUtils(){}
+    
+    public static File selectFile(Component parent, int mode){
+        final JFileChooser chooser = getChooser(mode);
+        if(chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION){
+            return chooser.getSelectedFile();
+        }
+        return null;
+    }
+    
+    public static synchronized JFileChooser getChooser(int mode){
+        if(chooser == null) chooser = new JFileChooser();
+        chooser.setFileSelectionMode(mode);
+        return chooser;
+    }
+    
+    public static void addDroppable(Component c, Function<File, Boolean> f, boolean first){
+        c.setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    final List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : droppedFiles) {
+                        if(f.apply(file) && first) break;
+                    }
+                } catch (UnsupportedFlavorException | IOException ex) {
+                    Logger.log.print(Level.SEVERE, "drag and drop failed", ex);
+                }
+            }
+        });
+    }
     
     public static void addClickableLink(String url, Component c, boolean logExceptions){
         c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -53,6 +101,27 @@ public class SwingUtils {
                 if(exception != null && logExceptions) Logger.log.print(Level.WARNING, "failed opening link on "+os, exception);
             }
         });
+    }
+    
+    public static void showMessageDialog(Component parent, String msg, String title, Level lvl, boolean beep){
+        int type = JOptionPane.INFORMATION_MESSAGE;
+        switch(lvl){
+            case WARNING:
+                type = JOptionPane.WARNING_MESSAGE;
+                break;
+            case ERROR:
+            case CRITICAL:
+            case SEVERE:
+                type = JOptionPane.ERROR_MESSAGE;
+                break;
+        
+        }
+        if(beep) Toolkit.getDefaultToolkit().beep();
+        JOptionPane.showMessageDialog(parent, msg, title, type);
+    }
+    
+    public static void showMessageDialog(Component parent, Exception ex, Level lvl, boolean beep){
+        showMessageDialog(parent, ex.getMessage(), "An exception has occurred!", lvl, beep);
     }
     
 }

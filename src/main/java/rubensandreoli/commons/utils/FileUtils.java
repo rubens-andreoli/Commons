@@ -19,6 +19,7 @@
 package rubensandreoli.commons.utils;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,9 +32,13 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.sound.midi.Sequence;
 import javax.swing.ImageIcon;
 import rubensandreoli.commons.others.CachedFile;
 
@@ -50,6 +55,14 @@ public class FileUtils {
     
     public static final String IMAGES_REGEX = ".*\\.jpg|jpeg|bmp|png|gif";
     public static final String IMAGES_GLOB = "*.{jpg,jpeg,bmp,png,gif}";
+    public static final HashSet<String> IMAGES_EXT = new HashSet<>();
+    static {
+	IMAGES_EXT.add(".jpg");
+        IMAGES_EXT.add(".jpeg");
+	IMAGES_EXT.add(".bmp");
+	IMAGES_EXT.add(".png");
+        IMAGES_EXT.add(".gif");
+    }
     
     public static final String EXTENSION_REGEX = "^.[a-z]{3,}$";
     public static final String SEPARATOR = "/";
@@ -89,7 +102,10 @@ public class FileUtils {
     public static String getParent(String pathname){
         pathname = pathname.replaceAll("[/\\\\]", SEPARATOR).trim();
         final int sepIndex = pathname.lastIndexOf(SEPARATOR);
-        if(sepIndex > 0) return pathname.substring(0, sepIndex);
+        if(sepIndex > 0) {
+            pathname = pathname.substring(0, sepIndex);
+            if(pathname.endsWith(":")) pathname += SEPARATOR;
+        }
         return pathname;
     }
     
@@ -425,6 +441,14 @@ public class FileUtils {
         try(var r = new FileReader(file)){
             return (byte) r.read(); //does NOT support extend chars (2 bytes)
         } catch (Exception ex) {
+            return null;
+        }
+    }
+    
+    public BufferedImage loadImage(String path){
+        try {
+            return ImageIO.read(new File(path));
+        } catch (IOException ex) {
             return null;
         }
     }

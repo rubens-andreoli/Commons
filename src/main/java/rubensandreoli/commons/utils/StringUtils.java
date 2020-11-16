@@ -46,11 +46,6 @@ public class StringUtils {
     public static double compare(String s1, String s2){
         return compare(s1, s2, LEVENSHTEIN);
     }
-    
-    public static long getStringSize(String str){
-        if(str == null) return 0L;
-        return str.length()*Character.BYTES;
-    }
 
     // <editor-fold defaultstate="collapsed" desc=" COMPARE MODES "> 
     private static double bagOfWords(String s1, String s2) {
@@ -159,7 +154,12 @@ public class StringUtils {
         return Math.min(a, Math.min(b, Math.min(c, d)));
     }
     // </editor-fold>
-
+    
+    public static long getStringSize(String str){
+        if(str == null) return 0L;
+        return str.length()*Character.BYTES;
+    }
+    
     public static int getNthIndexOf(String str, String regex, int n){
         return getNthIndexOf(str, regex, n, false);
     }

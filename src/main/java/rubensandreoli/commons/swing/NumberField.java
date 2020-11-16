@@ -41,7 +41,6 @@ public class NumberField extends javax.swing.JTextField{
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                
                 if(getText().isEmpty()){ //deleted value
                     clear();
                     return;
@@ -98,6 +97,14 @@ public class NumberField extends javax.swing.JTextField{
 
     public int getInt(){
         return Integer.parseInt(getText());
-    }        
+    }
+    
+    public boolean setInt(int val){
+        if(maxValue == 0 || (maxValue > 0 && val <= maxValue)){
+            setText(String.valueOf(val));
+            return true;
+        }
+        return false;
+    }
     
 }

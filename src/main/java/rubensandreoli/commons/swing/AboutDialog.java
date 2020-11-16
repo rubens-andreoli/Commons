@@ -26,7 +26,7 @@ import rubensandreoli.commons.others.Level;
 import rubensandreoli.commons.others.Logger;
 import rubensandreoli.commons.utils.FileUtils;
 
-/**
+/** References:
  * https://stackoverflow.com/questions/51660856/open-a-browser-with-java
  */
 public class AboutDialog extends javax.swing.JDialog {
@@ -65,6 +65,11 @@ public class AboutDialog extends javax.swing.JDialog {
         SwingUtils.addClickableLink("https://github.com/rubens-andreoli", lblLogo, false);
     }
     
+    public AboutDialog(Frame parent, String name, String version, String year){
+        this(parent, name, null, version, year, "images/logo.png");
+    }
+    
+    @Deprecated
     public AboutDialog(Frame parent, String name, String version, String year, String logo) {
 	this(parent, name, null, version, year, logo);
     }
@@ -241,9 +246,8 @@ public class AboutDialog extends javax.swing.JDialog {
     public void setVisible(boolean b) {
 	if(b){
             if(atributions!=null){
-                //TODO: add or remove panel if needed
                 txpAtributions.setText("<html><body>"+atributions.toString()+"</body></html>");
-            }
+            } //TODO: add or remove panel if needed
             btnClose.requestFocus();
         }
         super.setVisible(b);
