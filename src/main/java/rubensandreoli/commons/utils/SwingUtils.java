@@ -36,12 +36,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import rubensandreoli.commons.others.Level;
 import rubensandreoli.commons.others.Logger;
+import rubensandreoli.commons.others.PickConsumer;
 
 public class SwingUtils {
     
-    public static final int FILES_ONLY = JFileChooser.FILES_ONLY;
-    public static final int DIRECTORIES_ONLY = JFileChooser.DIRECTORIES_ONLY;
-    public static final int FILES_AND_DIRECTORIES = JFileChooser.FILES_AND_DIRECTORIES;
+    public static final int FILES_ONLY = FileUtils.FILES_ONLY;
+    public static final int DIRECTORIES_ONLY = FileUtils.DIRECTORIES_ONLY;
+    public static final int FILES_AND_DIRECTORIES = FileUtils.FILES_AND_DIRECTORIES;
     
     private static JFileChooser chooser;
     
@@ -61,7 +62,7 @@ public class SwingUtils {
         return chooser;
     }
     
-    public static void addDroppable(Component c, Function<File, Boolean> f, boolean first){
+    public static void addDroppable(Component c, PickConsumer<File> consumer){
         c.setDropTarget(new DropTarget() {
             @Override
             public synchronized void drop(DropTargetDropEvent evt) {
@@ -69,7 +70,7 @@ public class SwingUtils {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     final List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (File file : droppedFiles) {
-                        if(f.apply(file) && first) break;
+                        if(consumer.accept(file)) break;
                     }
                 } catch (UnsupportedFlavorException | IOException ex) {
                     Logger.log.print(Level.SEVERE, "drag and drop failed", ex);

@@ -35,12 +35,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 import javax.imageio.ImageIO;
-import javax.sound.midi.Sequence;
 import javax.swing.ImageIcon;
 import rubensandreoli.commons.others.CachedFile;
+import rubensandreoli.commons.others.Level;
+import rubensandreoli.commons.others.Logger;
 
 /** 
  * References:
@@ -77,6 +77,10 @@ public class FileUtils {
     public static final int DEFAULT_CONNECTION_TIMEOUT = 2000; //ms
     public static final int DEFAULT_READ_TIMEOUT = 4000; //ms
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4; //bytes
+    
+    public static final int FILES_ONLY = 0;
+    public static final int DIRECTORIES_ONLY = 1;
+    public static final int FILES_AND_DIRECTORIES = 2;
 
     private FileUtils(){}
     
@@ -196,11 +200,12 @@ public class FileUtils {
     public static final String buildPathname(File root, String...nodes){
         return buildPathname(root.getPath(), nodes);
     }
-    
+
     public static final String buildPathname(String root, String...nodes){
         root = root.replaceAll("[/\\\\]", SEPARATOR);
         if(nodes.length == 0) return root;
-        StringBuilder sb = new StringBuilder(root);
+        final StringBuilder sb = new StringBuilder(root);
+        if(root.endsWith(SEPARATOR)) sb.deleteCharAt(sb.length()-1);
         for (String node : nodes) {
             sb.append(SEPARATOR);
             sb.append(node);
@@ -336,31 +341,39 @@ public class FileUtils {
      * methods called.
      * 
      * @see Utils#createValidFile(String, String, String)
-     * @param source file to be moved
+     * @param file file to be moved
      * @param subfolder name of the sub-folder
      * @return {@code true} if and only if the file was moved; 
      *         {@code false} otherwise
      */
-    public static boolean moveFileToChild(File source, String subfolder){
-        if(!source.isFile()) throw new IllegalArgumentException();
-       
-        boolean moved = false;
-        File folder = new File(source.getParent(), subfolder);
-        File dest = new File(folder, source.getName());
+    public static boolean moveFileToChild(File file, String subfolder){
+        final File dest = new File(file.getParent(), subfolder);
         try{
-            folder.mkdir();
-            moved = source.renameTo(dest);
-            if(!moved){ //costly method only if failed above
-                dest = createValidFile(folder.getPath()+"/", 
-                    getFilename(source.getName()), 
-                    getExtension(source.getName())
-                );
-                moved = source.renameTo(dest);
-            }
-        }catch(Exception ex){
-            System.err.println(ex.getMessage());
+            dest.mkdir();
+        }catch(SecurityException ex){
+            System.err.println("ERROR: Failed creating folder "+dest.getAbsolutePath());
         }
-        if(!moved) System.err.println("ERROR: Failed moving "+source.getAbsolutePath()+" to "+dest.getAbsolutePath());
+        return moveFileTo(file, new File(file.getParent(), subfolder).getPath());
+    }
+    
+    public static boolean moveFileTo(File file, String folder){
+        return moveFileTo(new CachedFile(file), folder);
+    }
+    
+    public static boolean moveFileTo(CachedFile file, String folder){
+        if(!file.isFile()) throw new IllegalArgumentException("ERROR: move only files, not directories");
+        
+        boolean moved = false;
+        File dest = new File(folder+SEPARATOR+file.getName());
+        try{
+            moved = file.renameTo(dest);
+            if(!moved){ //costly method only if failed above
+                dest = createValidFile(folder+SEPARATOR, file.getFilename(), file.getExtension());
+                moved = file.renameTo(dest);
+            }
+        }catch(Exception ex){}
+        if(!moved) System.err.println("ERROR: Failed moving "+file.getAbsolutePath()+" to "+dest.getAbsolutePath());
+        
         return moved;
     }
     
@@ -455,17 +468,16 @@ public class FileUtils {
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" SCAN FILESYSTEM "> 
-    public static List<File> scanFiles(File root){
-	if(!root.isDirectory()) return null;
-	Stack<File> folders = new Stack<>();
+    public static void scanChildren(File root, List<File> children){
+	if(!root.isDirectory()) return;
+	final Stack<File> folders = new Stack<>();
 	folders.add(root);
-	List<File> files = new ArrayList<>();
 	
 	while(!folders.empty()){
             //2700-3000ms
 //	    File tempFolder = folders.pop();
-//	    File[] tempFolders = tempFolder.listFiles(f -> f.isDirectory());
-//	    File[] tempFiles = tempFolder.listFiles(f -> f.isFile());
+//	    File[] tempFolders = tempFolder.listChildren(f -> f.isDirectory());
+//	    File[] tempFiles = tempFolder.listChildren(f -> f.isFile());
 //	    if(tempFolders != null)folders.addAll(Arrays.asList(tempFolders));
 //	    if(tempFiles != null) files.addAll(Arrays.asList(tempFiles));
 	        
@@ -474,59 +486,65 @@ public class FileUtils {
 	    if(tempFiles == null) continue;
 	    for(File tempFile : tempFiles){
 		if(tempFile.isDirectory()) folders.push(tempFile);
-		else files.add(tempFile);
+		else children.add(tempFile);
 	    }
 	}
-	return files;
     }
     
-    public static void scanFiles(List<File> files, File root) {
-	File[] tempFiles = root.listFiles();
-	if (tempFiles == null) return;
-	for (File tempFile : tempFiles) {
+    public static void scanFiles(File root, List<File> files) {
+        if(!root.isDirectory()) return;
+        final File[] listOfFiles = root.listFiles();
+	for (File tempFile : listOfFiles) {
 	    if (tempFile.isFile()) files.add(tempFile);
-	    else scanFiles(files, tempFile);
+	    else scanFiles(tempFile, files);
 	}
     }
    
-    public static List<File> scanFolders(File root){
-	if(!root.isDirectory()) return null;
-	List<File> folders = new ArrayList<>();
+    public static void scanFolders(File root, List<File> folders){
+	if(!root.isDirectory()) return;
 	folders.add(root);
 	for(int i=0; i<folders.size(); i++){
-	    File[] tempFolders = folders.get(i).listFiles(f -> f.isDirectory());
+	    final File[] tempFolders = folders.get(i).listFiles(f -> f.isDirectory());
 	    if(tempFolders != null) folders.addAll(Arrays.asList(tempFolders));
 	}
-	return folders;
+    } 
+    
+    public static List<File> listChildren(File root, int mode, boolean showHidden){
+        final List<File> files = new ArrayList<>();
+        visitChildren(root, mode, showHidden, f -> files.add(f));
+        return files;
+    }
+    
+    public static void visitChildren(File root, int mode, boolean showHidden, Consumer<File> consumer){
+        if(!root.isDirectory()) return;
+        final File[] listOfFiles = root.listFiles();
+        switch(mode){
+            case FILES_ONLY:
+                for (File f : listOfFiles) {
+                    if (f.isFile() && (showHidden || !f.isHidden())) {
+                        consumer.accept(f);
+                    }
+                }
+                break;
+            case DIRECTORIES_ONLY:
+                for (File f : listOfFiles) {
+                    if (f.isDirectory() && (showHidden || !f.isHidden())) {
+                        consumer.accept(f);
+                    }
+                }
+                break;
+            case FILES_AND_DIRECTORIES:
+                for (File f : listOfFiles) {
+                    if (showHidden || !f.isHidden()) {
+                        consumer.accept(f);
+                    }
+                }
+                break;
+        }
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc=" DOWNLOAD ">
-    @Deprecated
-    public static long downloadToFile(String url, File file) throws IOException{
-        return downloadToFile(url, file, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT, DEFAULT_BUFFER_SIZE);
-    }
-    
-    @Deprecated
-    public static long downloadToFile(String url, File file, int connectionTimeout, int readTimeout) throws IOException{
-        return downloadToFile(url, file, connectionTimeout, readTimeout, DEFAULT_BUFFER_SIZE);
-    }
-    
-    @Deprecated
-    public static long downloadToFile(String url, File file, int connectionTimeout, int readTimeout, int bufferSize) throws IOException{
-        long bytesWritten = 0;
-        try (InputStream in = openInputStream(new URL(url), connectionTimeout, readTimeout);
-                OutputStream out = openOutputStream(file)) {
-            int bytesRead;
-            final byte[] buffer = new byte[bufferSize];
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-                bytesWritten += bytesRead;
-            }
-            return bytesWritten;
-        }
-    }
-    
     public static void downloadToFile(String url, CachedFile file) throws IOException{
         downloadToFile(url, file, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT, DEFAULT_BUFFER_SIZE);
     }

@@ -40,9 +40,9 @@ import rubensandreoli.commons.utils.SwingUtils;
 public class PathField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
     
-    public static final int FILES_ONLY = SwingUtils.FILES_ONLY;
-    public static final int DIRECTORIES_ONLY = SwingUtils.DIRECTORIES_ONLY;
-    public static final int FILES_AND_DIRECTORIES = SwingUtils.FILES_AND_DIRECTORIES;
+    public static final int FILES_ONLY = FileUtils.FILES_ONLY;
+    public static final int DIRECTORIES_ONLY = FileUtils.DIRECTORIES_ONLY;
+    public static final int FILES_AND_DIRECTORIES = FileUtils.FILES_AND_DIRECTORIES;
     public static final int MIN_LENGTH = FileUtils.MASKED_FILENAME_MIN_LENGTH;
     
     private final int mode;
@@ -65,7 +65,7 @@ public class PathField extends javax.swing.JTextField{
     }
     
     private void enableDrag(){
-        SwingUtils.addDroppable(this, file -> setText(file), true);
+        SwingUtils.addDroppable(this, file -> setText(file));
     }
 
     public void clear(){

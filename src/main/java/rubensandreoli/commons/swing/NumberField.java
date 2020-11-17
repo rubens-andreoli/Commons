@@ -87,7 +87,7 @@ public class NumberField extends javax.swing.JTextField{
         this.setValues(Integer.valueOf(initial), Integer.valueOf(max));
     }
     
-    public void setMaxValue(int max){
+    public void setMaxValue(int max){ //TODO: not working with 0
         this.setValues(DEFAULT_INITIAL_VALUE, max);
     }
     

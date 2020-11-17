@@ -19,11 +19,7 @@
 package rubensandreoli.commons.swing;
 
 import rubensandreoli.commons.utils.SwingUtils;
-import java.awt.Cursor;
 import java.awt.Frame;
-import java.io.IOException;
-import rubensandreoli.commons.others.Level;
-import rubensandreoli.commons.others.Logger;
 import rubensandreoli.commons.utils.FileUtils;
 
 /** References:
