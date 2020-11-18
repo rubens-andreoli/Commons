@@ -53,9 +53,9 @@ public class PathField extends javax.swing.JTextField{
         this.mode = mode;
         this.length = length;
         setEditable(false);
-        enableDrag();
+        addDropTarget();
     }
-    
+
     public PathField(int mode){
         this(mode, 0);
     }
@@ -64,29 +64,25 @@ public class PathField extends javax.swing.JTextField{
         this(FILES_AND_DIRECTORIES, 0);
     }
     
-    private void enableDrag(){
+    private void addDropTarget(){
         SwingUtils.addDroppable(this, file -> setText(file));
     }
 
-    public void clear(){
-        super.setText("");
-        file = null;
-    }
-    
     @Override
-    public String getText() {
-        return file==null? "" : file.getPath();
+    public void setDragEnabled(boolean b) {
+        if(b) SwingUtils.addDroppable(this, file -> setText(file));
+        else setDropTarget(null);
     }
-    
+
     @Override
-    public void setText(String pathname){
-        if(pathname == null) {
+    public void setText(String path){
+        if(path == null) {
             clear();
             return;
         }
-        pathname = FileUtils.normalize(pathname);
-        if(!setText(new File(pathname))){
-            throw new IllegalArgumentException(pathname+" is not a valid mode "+mode+" file");
+        path = FileUtils.normalize(path);
+        if(!setText(new File(path))){
+            throw new IllegalArgumentException(path+" is not a valid mode "+mode+" file");
         }
     }
     
@@ -114,15 +110,25 @@ public class PathField extends javax.swing.JTextField{
         fireActionPerformed();
         return true;
     }
+    
+    public boolean select(Component parent){
+        return setText(SwingUtils.selectFile(parent, mode), true);
+    }
+    
+    public void clear(){
+        super.setText("");
+        file = null;
+    }
+    
+    @Override
+    public String getText() {
+        return file==null? "" : file.getPath();
+    }
 
     public void setLenght(int length) {
         if(length < MIN_LENGTH) throw new IllegalArgumentException("length "+length+" < "+MIN_LENGTH);
         this.length = length;
-        super.setText(FileUtils.maskPathname(file.getPath(), length));
-    }
-
-    public boolean select(Component parent){
-        return setText(SwingUtils.selectFile(parent, mode), true);
+        if(file != null) setText(file.getPath());
     }
 
 }

@@ -97,6 +97,10 @@ public class CachedFile extends File{ //TODO: implement all methods
         return parent;
     }
     
+    public CachedFile getParentCachedFile(){
+        return new CachedFile(this.getParent());
+    }
+    
     @Override
     public String getName() {
         if(name == null) name = FileUtils.getName(super.getPath());

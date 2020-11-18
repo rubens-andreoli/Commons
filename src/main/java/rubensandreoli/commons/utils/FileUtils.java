@@ -351,9 +351,10 @@ public class FileUtils {
         try{
             dest.mkdir();
         }catch(SecurityException ex){
-            System.err.println("ERROR: Failed creating folder "+dest.getAbsolutePath());
+            System.err.println("ERROR: Failed creating folder "+dest.getPath());
+            return false;
         }
-        return moveFileTo(file, new File(file.getParent(), subfolder).getPath());
+        return moveFileTo(file, dest.getPath());
     }
     
     public static boolean moveFileTo(File file, String folder){
@@ -361,14 +362,14 @@ public class FileUtils {
     }
     
     public static boolean moveFileTo(CachedFile file, String folder){
-        if(!file.isFile()) throw new IllegalArgumentException("ERROR: move only files, not directories");
+        if(!file.isFile()) throw new IllegalArgumentException("This method can only move files");
         
         boolean moved = false;
-        File dest = new File(folder+SEPARATOR+file.getName());
+        File dest = new File(folder, file.getName());
         try{
             moved = file.renameTo(dest);
             if(!moved){ //costly method only if failed above
-                dest = createValidFile(folder+SEPARATOR, file.getFilename(), file.getExtension());
+                dest = createValidFile(folder, file.getFilename(), file.getExtension());
                 moved = file.renameTo(dest);
             }
         }catch(Exception ex){}
@@ -391,19 +392,36 @@ public class FileUtils {
         try{
             removed = file.delete();
         }catch(SecurityException ex){}
-        if(!removed) System.err.println("ERROR: Failed removing "+file.getAbsolutePath());
+        if(!removed) System.err.println("ERROR: Failed removing "+file.getPath());
         return removed;
     }
     
-    public static File createSubfolder(String parent, String child) throws IOException{
-        final String folder = String.format(SUBFOLDER_MASK, normalize(parent), child);
-        final File subfolder = new File(folder);
-        if(!subfolder.isDirectory()){
-            if(!subfolder.mkdir()){
-                throw new IOException("ERROR: failed creating folder "+folder);
+    public static File createFolder(File root, String...nodes){
+        for (String node : nodes) {
+            root = new File(root, node);
+        }
+        if(!root.isDirectory()){
+            boolean created = false;
+            try{
+                created = root.mkdirs();
+            }catch(SecurityException ex){}
+            if(!created){
+                System.err.println("ERROR: Failed creating folder "+root.getPath());
+                return null; //couldn't create
             }
         }
-        return subfolder;
+        return root; //already there or created
+    }
+    
+    public static File createFolder(String root, String...nodes){
+        return createFolder(new File(root), nodes);
+    }
+
+    @Deprecated
+    public static File createSubfolder(String parent, String child) throws IOException{ //TODO: teste ImageDownloader
+        final File folder = createFolder(parent, child);
+        if(folder == null) throw new IOException("Failed creating folder "+folder.getPath());
+        return folder;
     }
     // </editor-fold>
       
