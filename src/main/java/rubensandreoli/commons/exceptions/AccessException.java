@@ -18,6 +18,12 @@
  */
 package rubensandreoli.commons.exceptions;
 
+/**
+ * Checked version of the exception {@code Security­Exception}.
+ * 
+ * @see java.lang.Security­Exception
+ * @author Rubens A. Andreoli Jr.
+ */
 public class AccessException extends Exception{
     private static final long serialVersionUID = 1L;
 

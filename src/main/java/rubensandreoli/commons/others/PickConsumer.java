@@ -19,10 +19,11 @@
 package rubensandreoli.commons.others;
 
 /**
- * This class was created to improve code readability, as it works the same way as a Predicate.
+ * This class was created to improve code readability, as it works the same way as a {@code Predicate}.
  * 
- * @author Rubens A. Andreoli Jr.
+ * @see java.util.function.Predicate
  * @param <T> the type of the input to the predicate
+ * @author Rubens A. Andreoli Jr.
  */
 @FunctionalInterface
 public interface PickConsumer<T> {

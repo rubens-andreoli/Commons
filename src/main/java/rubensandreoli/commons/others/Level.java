@@ -18,6 +18,11 @@
  */
 package rubensandreoli.commons.others;
 
+/**
+ * Logging levels.
+ * 
+ * @author Rubens A. Andreoli Jr.
+ */
 public enum Level {
-    INFO, WARNING, ERROR, CRITICAL, SEVERE
+    DEBUG, INFO, WARNING, ERROR, CRITICAL, SEVERE
 }

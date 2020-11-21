@@ -79,6 +79,10 @@ public class SwingUtils {
         });
     }
     
+    public static void removeDroppable(Component c){
+        c.setDropTarget(null);
+    }
+    
     public static void addClickableLink(String url, Component c, boolean logExceptions){
         c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         c.addMouseListener(new MouseAdapter() {

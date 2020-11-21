@@ -38,9 +38,7 @@ public class KeyField extends javax.swing.JTextField{
             public void keyReleased(KeyEvent e) {
                 key = e.getKeyCode();
                 e.consume();
-                String text = KeyEvent.getKeyText(key);
-                if(text.startsWith("Unk")) text = "Unknown";
-                setText(text);
+                setText(key);
             }
         });
         
@@ -53,6 +51,16 @@ public class KeyField extends javax.swing.JTextField{
 
     public int getKey() {
         return key;
+    }
+
+    @Override
+    public void setText(String t) {
+        if(t.startsWith("Unk")) t = "Unknown";
+        super.setText(t);
+    }
+    
+    public void setText(int keyCode){
+        setText(KeyEvent.getKeyText(keyCode));
     }
     
 }

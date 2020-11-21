@@ -18,6 +18,14 @@
  */
 package rubensandreoli.commons.exceptions;
 
+/**
+ * Checked version of the exception {@code NumberFormatException}, {@code ClassCastException},
+ * or any other cast/conversion operation.
+ * 
+ * @see java.lang.NumberFormatException
+ * @see java.lang.ClassCastException
+ * @author Rubens A. Andreoli Jr.
+ */
 public class CastException extends Exception{
     private static final long serialVersionUID = 1L;
 

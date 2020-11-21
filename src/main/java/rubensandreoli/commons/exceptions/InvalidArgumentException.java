@@ -18,6 +18,12 @@
  */
 package rubensandreoli.commons.exceptions;
 
+/**
+ * Checked version of the exception {@code Illegal­Argument­Exception}.
+ * 
+ * @see java.lang.IllegalArgumentException
+ * @author Rubens A. Andreoli Jr.
+ */
 public class InvalidArgumentException extends Exception{
     private static final long serialVersionUID = 1L;
 

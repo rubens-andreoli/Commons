@@ -44,7 +44,7 @@ import rubensandreoli.commons.others.Logger;
 
 /** 
  * References:
- https://stackoverflow.com/questions/265769/maximum-name-length-in-ntfs-windows-xp-and-windows-vista#:~:text=14%20Answers&text=Individual%20components%20of%20a%20filename,files%2C%20248%20for%20folders).
+ * https://stackoverflow.com/questions/265769/maximum-name-length-in-ntfs-windows-xp-and-windows-vista#:~:text=14%20Answers&text=Individual%20components%20of%20a%20filename,files%2C%20248%20for%20folders).
  * https://stackoverflow.com/questions/57807466/what-is-the-maximum-filename-length-in-windows-10-java-would-try-catch-would
  * https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javadoc.html#@inheritDoc
  * https://examples.javacodegeeks.com/desktop-java/imageio/determine-format-of-an-image/
@@ -621,6 +621,10 @@ public class FileUtils {
         } catch (IOException e) {
             return false;
         }
+    }
+    
+    public static boolean hasImageExtension(File file){
+        return IMAGES_EXT.contains(getExtension(file.getPath()));
     }
     // </editor-fold>
     

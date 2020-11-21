@@ -18,6 +18,12 @@
  */
 package rubensandreoli.commons.others;
 
+/**
+ * This class was created to improve code readability, as it works the same way as a {@code Runnable}.
+ * 
+ * @see Runnable
+ * @author Rubens A. Andreoli Jr.
+ */
 @FunctionalInterface
 public interface Callback {
     void execute();
