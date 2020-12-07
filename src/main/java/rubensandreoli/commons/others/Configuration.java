@@ -24,29 +24,39 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 import rubensandreoli.commons.exceptions.CastException;
 import rubensandreoli.commons.utils.BooleanUtils;
 
+/**
+ * Used to register configuration key-value pairs into a {@code xml} file. <br>
+ * This file is generated, if it doesn't exist, on the same folder as the application.<br>
+ * When trying to access an entry, if it can't be found, or the value set doesn't comply to the limits set,<br>
+ * or the value appear to be set incorrectly, the default value provided will be saved and returned.
+ * 
+ * @author Rubens A. Andreoli Jr.
+ */
 public class Configuration {
     
-    private static final String COMMENT = "CONFIGURATIONS";
     public static final String FILENAME = "config.xml";
     
     public static final Configuration values = new Configuration(); //eager initialization;
-    
-    private Properties p;
-    private boolean changed;
+
+    private Properties p = new Properties();
+    private boolean changed = false;
     
     private Configuration(){
-        p = new Properties();
-        try(var bis = new BufferedInputStream(new FileInputStream(new File(FILENAME)))){
-            p.loadFromXML(bis);
-        } catch (IOException ex) {
-            Logger.log.print(Level.WARNING, "failed loading config file", ex);
+        final File file = new File(FILENAME);
+        if(file.isFile()){
+            try(var bis = new BufferedInputStream(new FileInputStream(file))){
+                p.loadFromXML(bis);
+            } catch (IOException ex) {
+                Logger.log.print(Level.ERROR, "failed loading config file", ex);
+            }
         }
     }
-    
+
     public String get(String key, String defaultValue){
         String v = p.getProperty(key);
         if(v == null){
@@ -98,15 +108,6 @@ public class Configuration {
         return v;
     }
     
-    @Deprecated
-    public Boolean get(String key){
-        final String v = p.getProperty(key);
-        if(v == null){
-            put(key, "false");
-        }
-        return Boolean.valueOf(v);
-    }
-    
     public Boolean get(String key, boolean defaultValue) {
         final String v = get(key, String.valueOf(defaultValue));
         try{
@@ -121,13 +122,32 @@ public class Configuration {
         changed = true;
     }
 
+    /**
+     * Save configuration key-values pairs to a {@code xml} file, if an entry was added or changed.
+     * 
+     * @see Configuration#save(String)
+     * @return {@code true} if and only if the values were saved;<br>
+     *         {@code false} if an exception occurred or there was no changes to be saved
+     */
     public boolean save(){
+        return save(null);
+    }
+    
+    /**
+     * Save configuration key-values pairs to a {@code xml} file, if an entry was added or changed.
+     * A title may be added to help identify the file. 
+     * 
+     * @param title a title for the entries; or {@code null} if no title is desired
+     * @return {@code true} if and only if the values were saved;<br>
+     *         {@code false} if an exception occurred or there was no changes to be saved
+     */
+    public boolean save(String title){
         if(changed){
             try(var bos = new BufferedOutputStream(new FileOutputStream(new File(FILENAME)))){
-                p.storeToXML(bos, COMMENT);
+                p.storeToXML(bos, title);
                 return true;
             } catch (IOException ex) {
-                Logger.log.print(Level.WARNING, "failed saving config file", ex);
+                Logger.log.print(Level.ERROR, "failed saving config file", ex);
             }
         }
         return false;

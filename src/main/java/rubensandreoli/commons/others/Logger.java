@@ -32,11 +32,11 @@ import java.time.LocalDateTime;
  */
 public class Logger {
 
-    private static final File FILE = new File("crash.log");
+    public static final String FILENAME = "crash.log";
     private static final String SEPARATOR = "-------------//----------------";
     private static final String LOG_MASK = "[%s]\r\ndate: %s\r\ncomment: %s\r\nmessage: %s\r\nstack trace: %s\r\n"+SEPARATOR+"\r\n";
     
-    public static final Logger log = new Logger(); //eager initialization;
+    public static final Logger log = new Logger(); //eager initialization
     
     private boolean enabled = false;
     private boolean verbose = false;
@@ -61,13 +61,13 @@ public class Logger {
         if(ex == null) return;
         if(!enabled) return;
         if(!verbose && lvl.compareTo(lvl.ERROR) < 0) return;
-        
+
         final StringBuilder trace = new StringBuilder();
         
         for (StackTraceElement e : ex.getStackTrace()) {
             trace.append(e.toString()).append("\r\n");
         }
-        try(var bw = new BufferedWriter(new FileWriter(FILE, true))){
+        try(var bw = new BufferedWriter(new FileWriter(new File(FILENAME), true))){
             bw.write(String.format(LOG_MASK, lvl.toString(), LocalDateTime.now(), comment, ex.getMessage(), trace));
         } catch (IOException e) {
             System.err.println("ERROR: failed writing log file");
