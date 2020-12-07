@@ -19,7 +19,7 @@
 package rubensandreoli.commons.others;
 
 /**
- * Logging levels.
+ * Logging levels in order of severity.
  * 
  * @author Rubens A. Andreoli Jr.
  */
