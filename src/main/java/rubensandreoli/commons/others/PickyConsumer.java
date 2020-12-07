@@ -26,6 +26,6 @@ package rubensandreoli.commons.others;
  * @author Rubens A. Andreoli Jr.
  */
 @FunctionalInterface
-public interface PickConsumer<T> {
+public interface PickyConsumer<T> {
     boolean accept(T t);
 }

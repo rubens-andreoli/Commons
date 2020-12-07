@@ -36,7 +36,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import rubensandreoli.commons.others.Level;
 import rubensandreoli.commons.others.Logger;
-import rubensandreoli.commons.others.PickConsumer;
+import rubensandreoli.commons.others.PickyConsumer;
 
 public class SwingUtils {
     
@@ -62,7 +62,7 @@ public class SwingUtils {
         return chooser;
     }
     
-    public static void addDroppable(Component c, PickConsumer<File> consumer){
+    public static void addDroppable(Component c, PickyConsumer<File> consumer){
         c.setDropTarget(new DropTarget() {
             @Override
             public synchronized void drop(DropTargetDropEvent evt) {
