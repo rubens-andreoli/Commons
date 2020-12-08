@@ -24,13 +24,13 @@ import java.util.Arrays;
 import rubensandreoli.commons.utils.FileUtils;
 import rubensandreoli.commons.utils.StringUtils;
 
-public class CachedFile extends File{ //TODO: implement all methods
+public class CachedFile extends File{ //TODO: review
     private static final long serialVersionUID = 1L;
  
     public static final int SIGNATURE_BYTES = 4;
     
     private Long size;
-    private String parent, filename, name, extension; //TODO: map with time read?
+    private String parent, filename, name, extension;
     private byte[] signature;
     private byte[] content;
     
@@ -56,6 +56,7 @@ public class CachedFile extends File{ //TODO: implement all methods
 
     @Override
     public boolean delete(){
+        //don't use FileUtils#deleteFile or it will generate a circular reference
         boolean removed = false;
         try{
             removed = super.delete();

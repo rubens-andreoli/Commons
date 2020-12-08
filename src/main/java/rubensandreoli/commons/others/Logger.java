@@ -38,8 +38,8 @@ public class Logger {
     
     public static final Logger log = new Logger(); //eager initialization
     
-    private boolean enabled = false;
-    private boolean verbose = false;
+    private boolean enabled;
+    private boolean verbose;
     
     private Logger(){};
 
@@ -51,7 +51,7 @@ public class Logger {
      * comment: [additional comment]<br>
      * message: [exception message]<br>
      * stack trace: [exception stack trace]<br>
-     * {@code Logger#SEPARATOR}
+     * {@code Logger::SEPARATOR}
      * 
      * @param lvl level of the exception
      * @param comment additional comment

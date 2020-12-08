@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 import rubensandreoli.commons.exceptions.CastException;
 import rubensandreoli.commons.utils.BooleanUtils;
@@ -33,7 +32,7 @@ import rubensandreoli.commons.utils.BooleanUtils;
  * Used to register configuration key-value pairs into a {@code xml} file. <br>
  * This file is generated, if it doesn't exist, on the same folder as the application.<br>
  * When trying to access an entry, if it can't be found, or the value set doesn't comply to the limits set,<br>
- * or the value appear to be set incorrectly, the default value provided will be saved and returned.
+ * or the value appear to be set incorrectly, the default value provided will be saved and used instead.
  * 
  * @author Rubens A. Andreoli Jr.
  */
@@ -43,18 +42,25 @@ public class Configuration {
     
     public static final Configuration values = new Configuration(); //eager initialization;
 
-    private Properties p = new Properties();
-    private boolean changed = false;
+    private Properties p;
+    private boolean changed;
     
     private Configuration(){
+        p = new Properties();
+        load();
+    }
+    
+    public boolean load(){
         final File file = new File(FILENAME);
         if(file.isFile()){
             try(var bis = new BufferedInputStream(new FileInputStream(file))){
                 p.loadFromXML(bis);
+                return true;
             } catch (IOException ex) {
                 Logger.log.print(Level.ERROR, "failed loading config file", ex);
             }
         }
+        return false;
     }
 
     public String get(String key, String defaultValue){
@@ -135,7 +141,6 @@ public class Configuration {
     
     /**
      * Save configuration key-values pairs to a {@code xml} file, if an entry was added or changed.
-     * A title may be added to help identify the file. 
      * 
      * @param title a title for the entries; or {@code null} if no title is desired
      * @return {@code true} if and only if the values were saved;<br>
@@ -156,5 +161,15 @@ public class Configuration {
     public boolean hasChanged(){
         return changed;
     }
- 
+
+    /**
+     * Tests if the configuration file exists.
+     * 
+     * @return {@code true} if and only if the configuration file exists;<br>
+     *         {@code false} otherwise
+     */
+    public boolean exists() {
+        return new File(FILENAME).isFile();
+    }
+
 }
