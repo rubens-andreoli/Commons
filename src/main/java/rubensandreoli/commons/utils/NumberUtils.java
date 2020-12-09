@@ -21,12 +21,12 @@ package rubensandreoli.commons.utils;
 public class NumberUtils {
     
     /**
-     * Parses the string argument as a signed decimal integer.
-     * Convenience method for {@code Integer#parseInt()} that doesn't
+     * Parses the string argument as a signed decimal integer.<br>
+     * Convenience method for {@code Integer::parseInt} that doesn't<br>
      * throw {@code NumberFormatException}.
      * 
      * @param value a {@code String} containing the {@code int} to be parsed
-     * @return the integer value or {@literal 0} if exception is thrown
+     * @return the integer value or {@literal 0} if an exception is thrown
      */
     public static int parseInteger(String value){
         try{
@@ -36,11 +36,28 @@ public class NumberUtils {
         }
     }
     
+    /**
+     * Parses the string argument as a signed double.<br>
+     * Convenience method for {@code Double::parseDouble} that doesn't throw<br>
+     * {@code NumberFormatException}, and supports multiple number formatting.
+     * 
+     * @param value a {@code String} containing the {@code double} to be parsed
+     * @return the double value or {@literal 0} if an exception is thrown
+     */
     public static double parseDouble(String value){
-        if(value.contains(".") && value.contains(",")){
-            value = value.replaceAll("\\.", "");
+        final int dotIndex = value.indexOf('.');
+        final int commaIndex = value.indexOf(',');
+        if(commaIndex >= 0){
+            if(dotIndex >= 0){
+                if(dotIndex < commaIndex){ //1.000.000,12
+                    value = value.replaceAll("\\.", "").replaceAll(",", ".");
+                }else{ //1,000,000.12
+                    value = value.replaceAll(",", "");
+                }
+            }else{ //100,12
+                value = value.replaceAll(",", ".");
+            }
         }
-        value = value.replaceAll(",", ".").replaceAll("%", "");
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException ex) {
