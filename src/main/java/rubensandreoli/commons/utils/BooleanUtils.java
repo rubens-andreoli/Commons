@@ -35,4 +35,25 @@ public class BooleanUtils {
         }
     }
     
+    /**
+     * Generates a random {@code boolean}.
+     * 
+     * @return generated random
+     */
+    public static boolean generateRandom(){
+        return generateRandom(50);
+    }
+
+    /**
+     * Generates a random {@code boolean} with the given odds.
+     * 
+     * @param odds percent chances of returning {@code true}
+     * @return generated random
+     */
+    public static boolean generateRandom(int odds){
+        if(odds <= 0) return false;
+        if(odds >= 100) return true;
+        return Math.random() < odds/100.0;
+    }
+
 }
