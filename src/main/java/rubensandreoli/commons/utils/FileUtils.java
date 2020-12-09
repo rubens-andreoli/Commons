@@ -51,7 +51,7 @@ import rubensandreoli.commons.others.Logger;
  * https://www.sparkhound.com/blog/detect-image-file-types-through-byte-arrays
  * https://stackoverflow.com/questions/27476845/what-is-the-difference-between-a-null-array-and-an-empty-array
  */
-public class FileUtils {
+public class FileUtils { //TODO: review
     
     public static final String IMAGES_REGEX = ".*\\.jpg|jpeg|bmp|png|gif";
     public static final String IMAGES_GLOB = "*.{jpg,jpeg,bmp,png,gif}";

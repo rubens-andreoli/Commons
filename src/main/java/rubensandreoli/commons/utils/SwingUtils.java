@@ -62,7 +62,7 @@ public class SwingUtils {
         return chooser;
     }
     
-    public static void addDroppable(Component c, PickyConsumer<File> consumer){
+    public static void setDropTarget(Component c, PickyConsumer<File> consumer){
         c.setDropTarget(new DropTarget() {
             @Override
             public synchronized void drop(DropTargetDropEvent evt) {
@@ -73,17 +73,17 @@ public class SwingUtils {
                         if(consumer.accept(file)) break;
                     }
                 } catch (UnsupportedFlavorException | IOException ex) {
-                    Logger.log.print(Level.SEVERE, "drag and drop failed", ex);
+                    Logger.log.print(Level.ERROR, "drag and drop failed", ex);
                 }
             }
         });
     }
     
-    public static void removeDroppable(Component c){
+    public static void removeDropTarget(Component c){
         c.setDropTarget(null);
     }
     
-    public static void addClickableLink(String url, Component c, boolean logExceptions){
+    public static void addClickableLink(Component c, String url){
         c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         c.addMouseListener(new MouseAdapter() {
             @Override
@@ -103,7 +103,9 @@ public class SwingUtils {
                     } catch (IOException ex) {exception = ex;}
                 }
 
-                if(exception != null && logExceptions) Logger.log.print(Level.WARNING, "failed opening link on "+os, exception);
+                if(exception != null){
+                    Logger.log.print(Level.ERROR, "failed opening link on "+os, exception);
+                }
             }
         });
     }
@@ -119,7 +121,8 @@ public class SwingUtils {
             case SEVERE:
                 type = JOptionPane.ERROR_MESSAGE;
                 break;
-        
+            default:
+                type = JOptionPane.INFORMATION_MESSAGE;
         }
         if(beep) Toolkit.getDefaultToolkit().beep();
         JOptionPane.showMessageDialog(parent, msg, title, type);

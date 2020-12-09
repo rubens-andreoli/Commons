@@ -30,6 +30,14 @@ public class StringUtils {
     
     private StringUtils(){}
     
+    /**
+     * Compares how similar two {@code String} values are using a given algorithm. 
+     * 
+     * @param s1 first {@code string} to compare
+     * @param s2 second {@code string} to compare
+     * @param mode algorithm to be used
+     * @return similarity ratio, between 0 and 1.0
+     */
     public static double compare(String s1, String s2, int mode){
         switch(mode){
             case BAG_OF_WORDS:
@@ -43,6 +51,14 @@ public class StringUtils {
        }
     }
     
+    /**
+     * Compares how similar two {@code String} values are using the Levenshtein algorithm.
+     * 
+     * @see StringUtils#compare(String, String, int)
+     * @param s1 first {@code string} to compare
+     * @param s2 second {@code string} to compare
+     * @return similarity ratio, between 0 and 1.0
+     */
     public static double compare(String s1, String s2){
         return compare(s1, s2, LEVENSHTEIN);
     }
@@ -155,6 +171,12 @@ public class StringUtils {
     }
     // </editor-fold>
     
+    /**
+     * Returns the number of bytes used to represent a {@code String} value.
+     * 
+     * @param str a {@code String} value
+     * @return the number of bytes the given {@code String} occupies
+     */
     public static long getStringSize(String str){
         if(str == null) return 0L;
         return str.length()*Character.BYTES;
@@ -166,7 +188,7 @@ public class StringUtils {
     
     public static int getNthIndexOf(String str, String regex, int n, boolean reverse){
         if(reverse) str = new StringBuilder(str).reverse().toString();
-        String[] tokens = str.split(regex);
+        final String[] tokens = str.split(regex);
         if(tokens.length <= n) return -1;
         
         int index = n-1; //add regex previous occurances

@@ -38,22 +38,22 @@ public class BooleanUtils {
     /**
      * Generates a random {@code boolean}.
      * 
-     * @return generated random
+     * @return generated {@code boolean} value
      */
-    public static boolean generateRandom(){
+    public static boolean generateBoolean(){
         return Math.random() < 0.5;
     }
 
     /**
      * Generates a random {@code boolean} with the given odds.
      * 
-     * @param odds percent chances of returning {@code true}
-     * @return generated random
+     * @param ratio chances of returning {@code true}, between 0 and 1.0
+     * @return generated {@code boolean} value
      */
-    public static boolean generateRandom(int odds){
-        if(odds <= 0) return false;
-        if(odds >= 100) return true;
-        return Math.random() < odds/100.0;
+    public static boolean generateBoolean(double ratio){
+        if(ratio <= 0.0) return false;
+        if(ratio >= 1.0) return true;
+        return Math.random() < ratio;
     }
 
 }

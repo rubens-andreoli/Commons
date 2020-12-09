@@ -57,8 +57,8 @@ public class AboutDialog extends javax.swing.JDialog {
         txpLicense.setText("<html><body style=\"text-align:justify\">"+GNU_PUBLIC+"</body></html>");
         txpLicense.setCaretPosition(0);
         
-        SwingUtils.addClickableLink("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Q5NUAPVCTC5U4&currency_code=USD&source=url", lblHere, true);
-        SwingUtils.addClickableLink("https://github.com/rubens-andreoli", lblLogo, false);
+        SwingUtils.addClickableLink(lblHere, "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Q5NUAPVCTC5U4&currency_code=USD&source=url");
+        SwingUtils.addClickableLink(lblLogo, "https://github.com/rubens-andreoli");
     }
     
     public AboutDialog(Frame parent, String name, String version, String year){

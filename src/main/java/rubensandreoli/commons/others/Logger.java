@@ -75,7 +75,7 @@ public class Logger {
     }
     
     /**
-     * Print exception with an empty comment section.
+     * Print an exception with an empty comment section.
      * 
      * @see Level
      * @see Logger#print(Level, String, Exception)
@@ -87,7 +87,7 @@ public class Logger {
     }
     
     /**
-     * Print exception with an empty comment section and a predetermined {@code Level}.<br>
+     * Print an exception with an empty comment section and a predetermined {@code Level}.<br>
      * Instances of {@code RuntimeException} are considered {@code Level.SEVERE} and all others are {@code Level.INFO}.
      * 
      * @see Level

@@ -65,13 +65,21 @@ public class NumberUtils {
         }
     }
 
+    /**
+     * Generates a random integer between two given values.
+     * 
+     * @param min lower bound
+     * @param max upper bound; must be bigger than the lower bound
+     * @return a random {@code int} between the bounds set
+     * @throws IllegalArgumentException if the higher bound is smaller or equal to the lower bound
+     */
     public static int getRandomBetween(int min, int max){
-        if(max < min) max = min;
+        if(max <= min) throw new IllegalArgumentException("max value must be bigger than min");
         return (int) (Math.random() * (max - min)) + min;
     }
 
     /**
-     * Test if two {@code double} values are equal within a given tolerance.
+     * Tests if two {@code double} values are equal within a given tolerance.
      * 
      * @param d1 first {@code double} to compare
      * @param d2 second {@code double} to compare
