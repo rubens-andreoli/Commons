@@ -41,7 +41,7 @@ public class BooleanUtils {
      * @return generated random
      */
     public static boolean generateRandom(){
-        return generateRandom(50);
+        return Math.random() < 0.5;
     }
 
     /**

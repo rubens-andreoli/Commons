@@ -69,5 +69,18 @@ public class NumberUtils {
         if(max < min) max = min;
         return (int) (Math.random() * (max - min)) + min;
     }
-    
+
+    /**
+     * Test if two {@code double} values are equal within a given tolerance.
+     * 
+     * @param d1 first {@code double} to compare
+     * @param d2 second {@code double} to compare
+     * @param epsilon tolerance
+     * @return {@code true} if and only if the {@code double} values are equal considering the tolerance given;<br>
+     *         {@code false} otherwise
+     */
+    public static boolean equalsDouble(double d1, double d2, double epsilon){
+        return Math.abs(d1 - d2) <= epsilon;
+    }
+
 }
