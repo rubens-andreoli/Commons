@@ -21,8 +21,8 @@ package rubensandreoli.commons.utils;
 public class NumberUtils {
     
     /**
-     * Parses the string argument as a signed decimal integer.<br>
-     * Convenience method for {@code Integer::parseInt} that doesn't<br>
+     * Parses the {@code String} argument as a signed decimal integer.<br>
+     * Convenience method for {@code Integer::parseInt} that doesn't
      * throw {@code NumberFormatException}.
      * 
      * @param value a {@code String} containing the {@code int} to be parsed
@@ -37,12 +37,12 @@ public class NumberUtils {
     }
     
     /**
-     * Parses the string argument as a signed double.<br>
-     * Convenience method for {@code Double::parseDouble} that doesn't throw<br>
+     * Parses the {@code String} argument as a signed {@code double}.<br>
+     * Convenience method for {@code Double::parseDouble} that doesn't throw
      * {@code NumberFormatException}, and supports multiple number formatting.
      * 
      * @param value a {@code String} containing the {@code double} to be parsed
-     * @return the double value or {@literal 0} if an exception is thrown
+     * @return the {@code double} value or {@literal 0} if an exception is thrown
      */
     public static double parseDouble(String value){
         final int dotIndex = value.indexOf('.');

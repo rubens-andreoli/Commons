@@ -24,6 +24,16 @@ public class BooleanUtils {
     
     private BooleanUtils(){};
     
+    /**
+     * Parses the {@code String} argument as a {@code boolean}.<br>
+     * The {@code boolean} returned represents the value {@code true} if the {@code String} argument
+     * is equal, ignoring case, to the {@code String} "true", or {@code false} if the {@code String} is equal, 
+     * ignoring case "false".
+     * 
+     * @param s the {@code String} containing the {@code boolean} representation to be parsed
+     * @return the {@code boolean} value
+     * @throws CastException if the {@code String} is neither "true" nor "false", ignoring case
+     */
     public static boolean parseBoolean(String s) throws CastException {
         switch(s.toLowerCase()){
             case "true":
@@ -38,7 +48,7 @@ public class BooleanUtils {
     /**
      * Generates a random {@code boolean}.
      * 
-     * @return generated {@code boolean} value
+     * @return the generated {@code boolean} value
      */
     public static boolean generateBoolean(){
         return Math.random() < 0.5;
@@ -48,7 +58,7 @@ public class BooleanUtils {
      * Generates a random {@code boolean} with the given odds.
      * 
      * @param ratio chances of returning {@code true}, between 0 and 1.0
-     * @return generated {@code boolean} value
+     * @return the generated {@code boolean} value
      */
     public static boolean generateBoolean(double ratio){
         if(ratio <= 0.0) return false;

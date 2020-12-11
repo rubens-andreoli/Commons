@@ -66,8 +66,8 @@ public class StringUtils {
     // <editor-fold defaultstate="collapsed" desc=" COMPARE MODES "> 
     private static double bagOfWords(String s1, String s2) {
 	if(s1.equals(s2)) return 1;
-	Set<String> w1 = splitWords(s1);
-	Set<String> w2 = splitWords(s2);
+	final Set<String> w1 = splitWords(s1);
+	final Set<String> w2 = splitWords(s2);
 	int similar = 0;
 	for (String word : w1) {
 	    if (w2.contains(word)) similar++;
@@ -75,6 +75,7 @@ public class StringUtils {
 	return (similar / (double)Math.max(w1.size(), w2.size()));
     }
     
+    @SuppressWarnings("empty-statement")
     public static Set<String> splitWords(String s){
 	s = s.replaceAll("('s)", "") //remove 's
             .replaceAll("[?!#%'(),]", "") //remove ? ! # % ' ( ) ,
@@ -82,10 +83,10 @@ public class StringUtils {
             .replaceAll("[\\s]{2,}", " ") // replace 2 consecutive spaces for space
             .replaceAll("(?<=[a-z])(?=[A-Z][a-z])", " ") //add space on camelcase without replacing
             .toLowerCase();
-	String[] tokens = s.split(" ");
-	Set<String> words = new HashSet<>();
+	final String[] tokens = s.split(" ");
+	final Set<String> words = new HashSet<>();
 	for (String token : tokens) {
-	    for(int i=1; !words.add(token+i); i++);
+	    for(int i=1; !words.add(token+i); i++); //append occurance marker to each word
 	}
 	return words;
     }
@@ -96,7 +97,7 @@ public class StringUtils {
 	    longer = s2;
 	    shorter = s1;
 	}
-	int longerLength = longer.length();
+	final int longerLength = longer.length();
 	if (longerLength == 0) return 1.0;
 	return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
     }
@@ -104,7 +105,7 @@ public class StringUtils {
     private static int editDistance(String s1, String s2) {
 	s1 = s1.toLowerCase();
 	s2 = s2.toLowerCase();
-	int[] costs = new int[s2.length() + 1];
+	final int[] costs = new int[s2.length() + 1];
 	for (int i = 0; i <= s1.length(); i++) {
 	    int lastValue = i;
 	    for (int j = 0; j <= s2.length(); j++) {
@@ -125,16 +126,15 @@ public class StringUtils {
 	return costs[s2.length()];
     }
     
-    
     private static double demerau(String s1, String s2) {
         if (s1.equals(s2)) return 1;
-	int s1Length = s1.length();
-	int s2Length = s2.length();
-        int inf = s1Length + s2Length;
-        HashMap<Character, Integer> da = new HashMap<Character, Integer>();
+	final int s1Length = s1.length();
+	final int s2Length = s2.length();
+        final int inf = s1Length + s2Length;
+        final HashMap<Character, Integer> da = new HashMap<>();
         for(int d=0; d<s1Length; d++) da.put(s1.charAt(d), 0);
         for(int d=0; d<s2Length; d++) da.put(s2.charAt(d), 0);
-        int[][] h = new int[s1Length+2][s2Length+2];
+        final int[][] h = new int[s1Length+2][s2Length+2];
         for(int i=0; i<=s1Length; i++) {
             h[i+1][0] = inf;
             h[i+1][1] = i;
@@ -182,20 +182,26 @@ public class StringUtils {
         return str.length()*Character.BYTES;
     }
     
-    public static int getNthIndexOf(String str, String regex, int n){
-        return getNthIndexOf(str, regex, n, false);
+    public static int getNthIndexOf(String str, char c, int n){
+        return getNthIndexOf(str, c, n, false);
     }
     
-    public static int getNthIndexOf(String str, String regex, int n, boolean reverse){
+    /**
+     * Returns the index within the {@code String} of the nth occurrence of a given character.
+     * 
+     * @param str a {@code String} to search within
+     * @param c the {@code char} to search for
+     * @param n occurrence
+     * @param reverse {@code true} if occurrence should be counted from left to right; {@code false} for right to left
+     * @return index of the nth occurrence or {@literal -1} if not found
+     */
+    public static int getNthIndexOf(String str, char c, int n, boolean reverse){
+        if(n <= 0) return -1;
         if(reverse) str = new StringBuilder(str).reverse().toString();
-        final String[] tokens = str.split(regex);
-        if(tokens.length <= n) return -1;
-        
-        int index = n-1; //add regex previous occurances
-        for (int i = 0; i < n; i++) {
-            index += tokens[i].length();
+        int index = str.indexOf(c, 0);
+        while (n-- > 1 && index != -1){
+            index = str.indexOf(c, index+1);
         }
-        return reverse? str.length()-index:index ;
+        return (index == -1 || !reverse) ? index : (str.length()-1)-index;
     }
-    
 }

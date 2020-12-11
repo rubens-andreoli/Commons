@@ -31,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Function;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import rubensandreoli.commons.others.Level;
@@ -49,7 +48,7 @@ public class SwingUtils {
     private SwingUtils(){}
     
     public static File selectFile(Component parent, int mode){
-        final JFileChooser chooser = getChooser(mode);
+        getChooser(mode);
         if(chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION){
             return chooser.getSelectedFile();
         }
@@ -62,6 +61,7 @@ public class SwingUtils {
         return chooser;
     }
     
+    @SuppressWarnings("unchecked")
     public static void setDropTarget(Component c, PickyConsumer<File> consumer){
         c.setDropTarget(new DropTarget() {
             @Override
@@ -111,7 +111,7 @@ public class SwingUtils {
     }
     
     public static void showMessageDialog(Component parent, String msg, String title, Level lvl, boolean beep){
-        int type = JOptionPane.INFORMATION_MESSAGE;
+        int type;
         switch(lvl){
             case WARNING:
                 type = JOptionPane.WARNING_MESSAGE;
