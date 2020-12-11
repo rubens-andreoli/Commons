@@ -18,8 +18,8 @@
  */
 package rubensandreoli.commons.swing;
 
-import rubensandreoli.commons.utils.SwingUtils;
 import java.awt.Frame;
+import rubensandreoli.commons.utils.SwingUtils;
 import rubensandreoli.commons.utils.FileUtils;
 
 /** References:
@@ -46,8 +46,10 @@ public class AboutDialog extends javax.swing.JDialog {
 	super(parent);
 	initComponents();
         
-        setLocationRelativeTo(parent);
-        setIconImage(parent.getIconImage());
+        if(parent != null){
+            setLocationRelativeTo(parent);
+            setIconImage(parent.getIconImage());
+        }
 
         lblLogo.setIcon(FileUtils.loadIcon(logo));
         lblProgram.setText(name);
@@ -63,11 +65,6 @@ public class AboutDialog extends javax.swing.JDialog {
     
     public AboutDialog(Frame parent, String name, String version, String year){
         this(parent, name, null, version, year, "images/logo.png");
-    }
-    
-    @Deprecated
-    public AboutDialog(Frame parent, String name, String version, String year, String logo) {
-	this(parent, name, null, version, year, logo);
     }
 
     @SuppressWarnings("unchecked")
@@ -91,6 +88,7 @@ public class AboutDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About");
+        setMaximumSize(new java.awt.Dimension(380, 336));
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
         setResizable(false);
 
@@ -220,7 +218,6 @@ public class AboutDialog extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JLabel lblCopyright;
@@ -243,7 +240,11 @@ public class AboutDialog extends javax.swing.JDialog {
 	if(b){
             if(atributions!=null){
                 txpAtributions.setText("<html><body>"+atributions.toString()+"</body></html>");
-            } //TODO: add or remove panel if needed
+            }else{
+                this.remove(sclAtributions);
+                this.setSize(this.getWidth(), this.getHeight() - sclAtributions.getHeight()-10);
+                this.validate();
+            }
             btnClose.requestFocus();
         }
         super.setVisible(b);
