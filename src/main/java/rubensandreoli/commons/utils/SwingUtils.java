@@ -18,8 +18,12 @@
  */
 package rubensandreoli.commons.utils;
 
+import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -31,12 +35,22 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import rubensandreoli.commons.others.Level;
 import rubensandreoli.commons.others.Logger;
 import rubensandreoli.commons.others.PickyConsumer;
 
+/**
+ * References:
+ * https://stackoverflow.com/questions/53419438/create-a-java-application-that-keeps-your-computer-from-going-idle-without-movin
+ * https://stackoverflow.com/questions/7814089/how-to-schedule-a-periodic-task-in-java
+ * 
+ * @author Rubens A. Andreoli Jr.
+ */
 public class SwingUtils {
     
     public static final int FILES_ONLY = FileUtils.FILES_ONLY;
@@ -44,6 +58,7 @@ public class SwingUtils {
     public static final int FILES_AND_DIRECTORIES = FileUtils.FILES_AND_DIRECTORIES;
     
     private static JFileChooser chooser;
+    private static ScheduledExecutorService timer;
     
     private SwingUtils(){}
     
@@ -130,6 +145,20 @@ public class SwingUtils {
     
     public static void showMessageDialog(Component parent, Exception ex, Level lvl, boolean beep){
         showMessageDialog(parent, ex.getMessage(), "An exception has occurred!", lvl, beep);
+    }
+    
+    public static void keepAwake(boolean b) throws AWTException{
+        if(timer == null){
+            timer = Executors.newScheduledThreadPool(1);
+            final Robot robot = new Robot();
+            timer.scheduleAtFixedRate(() -> {
+                final Point point = MouseInfo.getPointerInfo().getLocation();
+                robot.mouseMove(point.x, point.y);
+            }, 0, 1, TimeUnit.MINUTES);
+        }else if (!b){
+            timer.shutdownNow();
+            timer = null;
+        }
     }
     
 }

@@ -39,8 +39,6 @@ import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import rubensandreoli.commons.others.CachedFile;
-import rubensandreoli.commons.others.Level;
-import rubensandreoli.commons.others.Logger;
 
 /** 
  * References:
@@ -486,46 +484,59 @@ public class FileUtils { //TODO: review
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" SCAN FILESYSTEM "> 
-    public static void scanChildren(File root, List<File> children){
-	if(!root.isDirectory()) return;
-	final Stack<File> folders = new Stack<>();
-	folders.add(root);
-	
-	while(!folders.empty()){
-            //2700-3000ms
-//	    File tempFolder = folders.pop();
-//	    File[] tempFolders = tempFolder.listChildren(f -> f.isDirectory());
-//	    File[] tempFiles = tempFolder.listChildren(f -> f.isFile());
-//	    if(tempFolders != null)folders.addAll(Arrays.asList(tempFolders));
-//	    if(tempFiles != null) files.addAll(Arrays.asList(tempFiles));
-	        
-	    //1600-1800ms
-            File[] tempFiles = folders.pop().listFiles();
-	    if(tempFiles == null) continue;
-	    for(File tempFile : tempFiles){
-		if(tempFile.isDirectory()) folders.push(tempFile);
-		else children.add(tempFile);
-	    }
-	}
+    public static List<File> scanChildren(File root, int mode){
+        return scanChildren(root, mode, true);
     }
     
-    public static void scanFiles(File root, List<File> files) {
-        if(!root.isDirectory()) return;
-        final File[] listOfFiles = root.listFiles();
-	for (File tempFile : listOfFiles) {
-	    if (tempFile.isFile()) files.add(tempFile);
-	    else scanFiles(tempFile, files);
-	}
+    public static List<File> scanChildren(File root, int mode, boolean showHidden){
+        if(!root.isDirectory()) return null;
+        final List<File> files = new ArrayList<>();
+        
+        switch(mode){
+            case FILES_ONLY: {
+                final Stack<File> folders = new Stack<>();
+                folders.add(root);
+                while(!folders.empty()){
+                    final File[] folderFiles = folders.pop().listFiles(f -> showHidden || !f.isHidden());
+                    if(folderFiles == null) continue;
+                    for(File file : folderFiles){
+                        if(file.isDirectory()) folders.push(file);
+                        else files.add(file);
+                    }
+                }
+                break;}
+            
+            case DIRECTORIES_ONLY:{
+                files.add(root);
+
+                for(int i=0; i<files.size(); i++){
+                    final File[] folders = files.get(i).listFiles(f -> f.isDirectory() && (showHidden || !f.isHidden()));
+                    if(folders != null) files.addAll(Arrays.asList(folders));
+                }
+                break;}
+            
+            case FILES_AND_DIRECTORIES:{
+                final Stack<File> folders = new Stack<>();
+                folders.add(root);
+                while(!folders.empty()){
+                    final File folder = folders.pop();
+                    files.add(folder);
+                    final File[] folderFiles = folder.listFiles(f -> showHidden || !f.isHidden());
+                    if(folderFiles == null) continue;
+                    for(File file : folderFiles){
+                        if(file.isDirectory()) folders.push(file);
+                        else files.add(file);
+                    }
+                }
+                break;}
+        }       
+        
+        return files;
     }
-   
-    public static void scanFolders(File root, List<File> folders){
-	if(!root.isDirectory()) return;
-	folders.add(root);
-	for(int i=0; i<folders.size(); i++){
-	    final File[] tempFolders = folders.get(i).listFiles(f -> f.isDirectory());
-	    if(tempFolders != null) folders.addAll(Arrays.asList(tempFolders));
-	}
-    } 
+
+    public static List<File> listChildren(File root, int mode){
+        return listChildren(root, mode, true);
+    }
     
     public static List<File> listChildren(File root, int mode, boolean showHidden){
         final List<File> files = new ArrayList<>();
@@ -538,23 +549,23 @@ public class FileUtils { //TODO: review
         final File[] listOfFiles = root.listFiles();
         switch(mode){
             case FILES_ONLY:
-                for (File f : listOfFiles) {
-                    if (f.isFile() && (showHidden || !f.isHidden())) {
-                        consumer.accept(f);
+                for (File file : listOfFiles) {
+                    if (file.isFile() && (showHidden || !file.isHidden())) {
+                        consumer.accept(file);
                     }
                 }
                 break;
             case DIRECTORIES_ONLY:
-                for (File f : listOfFiles) {
-                    if (f.isDirectory() && (showHidden || !f.isHidden())) {
-                        consumer.accept(f);
+                for (File file : listOfFiles) {
+                    if (file.isDirectory() && (showHidden || !file.isHidden())) {
+                        consumer.accept(file);
                     }
                 }
                 break;
             case FILES_AND_DIRECTORIES:
-                for (File f : listOfFiles) {
-                    if (showHidden || !f.isHidden()) {
-                        consumer.accept(f);
+                for (File file : listOfFiles) {
+                    if (showHidden || !file.isHidden()) {
+                        consumer.accept(file);
                     }
                 }
                 break;
@@ -573,7 +584,7 @@ public class FileUtils { //TODO: review
     
     public static void downloadToFile(String url, CachedFile file, int connectionTimeout, int readTimeout, int bufferSize) throws IOException{
         long bytesWritten = 0;
-        try (InputStream in = openInputStream(new URL(url), connectionTimeout, readTimeout);
+        try (final InputStream in = openInputStream(new URL(url), connectionTimeout, readTimeout);
                 OutputStream out = openOutputStream(file)) {
             int bytesRead;
             final byte[] buffer = new byte[bufferSize];
@@ -590,7 +601,7 @@ public class FileUtils { //TODO: review
     
     private static InputStream openInputStream(final URL path, int connectionTimeout, int readTimeout) throws IOException{
         try {
-            var conn = path.openConnection();
+            final var conn = path.openConnection();
             conn.setConnectTimeout(connectionTimeout);
             conn.setReadTimeout(readTimeout);
             return conn.getInputStream();
@@ -605,7 +616,7 @@ public class FileUtils { //TODO: review
         }else if (file.isFile() && !file.canWrite()) {
             throw new IOException("File '"+file+"' cannot be overridden");
         } else {
-            File parent = file.getParentFile();
+            final File parent = file.getParentFile();
             if (parent != null && !parent.mkdirs() && !parent.isDirectory()) { //if not given, not created, and not validated
                 throw new IOException("Directory '"+parent+"' could not be created");
             }
