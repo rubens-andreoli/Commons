@@ -22,6 +22,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JTextField;
 
+/**
+ * A text field that accepts only one key at a time, and displays a {@code String} describing said key.
+ * 
+ * @author Rubens A. Andreoli Jr.
+ */
 public class KeyField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
 
@@ -30,21 +35,24 @@ public class KeyField extends javax.swing.JTextField{
     public KeyField() {
         addKeyListener(new KeyAdapter() {
             @Override
+            public void keyTyped(KeyEvent e) {
+                e.consume();
+            }
+            
+            @Override
             public void keyPressed(KeyEvent e) {
                 clear();
             }
             
             @Override
             public void keyReleased(KeyEvent e) {
-                key = e.getKeyCode();
-                e.consume();
-                setText(key);
+                setText(e.getKeyCode());
             }
         });
         
         setHorizontalAlignment(JTextField.CENTER);
     }
-    
+
     public void clear(){
         setText("");
     }
@@ -53,13 +61,25 @@ public class KeyField extends javax.swing.JTextField{
         return key;
     }
 
+    /**
+     * This method won't set the key code just the text to be displayed.
+     * 
+     * @see KeyField#setText(int)
+     * @param t {@code String} displayed by the field
+     */
     @Override
     public void setText(String t) {
         if(t.startsWith("Unk")) t = "Unknown";
         super.setText(t);
     }
     
+    /**
+     * Sets the key code and text displayed by this field.
+     * 
+     * @param keyCode integer value representing a keyboard key
+     */
     public void setText(int keyCode){
+        key = keyCode;
         setText(KeyEvent.getKeyText(keyCode));
     }
     

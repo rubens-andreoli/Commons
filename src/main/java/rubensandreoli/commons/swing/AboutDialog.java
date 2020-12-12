@@ -241,9 +241,9 @@ public class AboutDialog extends javax.swing.JDialog {
             if(atributions!=null){
                 txpAtributions.setText("<html><body>"+atributions.toString()+"</body></html>");
             }else{
-                this.remove(sclAtributions);
-                this.setSize(this.getWidth(), this.getHeight() - sclAtributions.getHeight()-10);
-                this.validate();
+                remove(sclAtributions);
+                setSize(getWidth(), getHeight() - sclAtributions.getHeight()-10);
+                validate();
             }
             btnClose.requestFocus();
         }

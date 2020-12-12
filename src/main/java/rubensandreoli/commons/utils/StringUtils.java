@@ -182,6 +182,15 @@ public class StringUtils {
         return str.length()*Character.BYTES;
     }
     
+    /**
+     * Returns the index within the {@code String} of the nth occurrence of a given character.
+     * 
+     * @see StringUtils#getNthIndexOf(String, char, int, boolean)
+     * @param str a {@code String} to search within
+     * @param c the {@code char} to search for
+     * @param n occurrence from left to right
+     * @return index of the nth occurrence or {@literal -1} if not found
+     */
     public static int getNthIndexOf(String str, char c, int n){
         return getNthIndexOf(str, c, n, false);
     }
