@@ -213,4 +213,12 @@ public class StringUtils {
         }
         return (index == -1 || !reverse) ? index : (str.length()-1)-index;
     }
+
+    public static String concat(String...strings){
+        final StringBuilder sb = new StringBuilder();
+        for (String string : strings) {
+            sb.append(string);
+        }
+        return sb.toString();
+    }
 }

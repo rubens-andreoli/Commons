@@ -33,7 +33,7 @@ import javax.swing.text.DefaultCaret;
  * https://www.baeldung.com/java-list-iterate-backwards
  * https://stackoverflow.com/questions/2483572/making-a-jscrollpane-automatically-scroll-all-the-way-down
  */
-public class RecycledTextArea extends javax.swing.JTextArea{
+public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
     private static final long serialVersionUID = 1L;
     
     public static final int DEFAULT_MAX_SIZE = 120;

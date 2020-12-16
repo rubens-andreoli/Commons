@@ -56,6 +56,7 @@ public class SwingUtils {
     public static final int FILES_ONLY = FileUtils.FILES_ONLY;
     public static final int DIRECTORIES_ONLY = FileUtils.DIRECTORIES_ONLY;
     public static final int FILES_AND_DIRECTORIES = FileUtils.FILES_AND_DIRECTORIES;
+    private static final int TIMER_INTERVAL = 1; //minutes
     
     private static JFileChooser chooser;
     private static ScheduledExecutorService timer;
@@ -154,7 +155,7 @@ public class SwingUtils {
             timer.scheduleAtFixedRate(() -> {
                 final Point point = MouseInfo.getPointerInfo().getLocation();
                 robot.mouseMove(point.x, point.y);
-            }, 0, 1, TimeUnit.MINUTES);
+            }, TIMER_INTERVAL, TIMER_INTERVAL, TimeUnit.MINUTES);
         }else if (!b){
             timer.shutdownNow();
             timer = null;

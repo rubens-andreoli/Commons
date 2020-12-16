@@ -37,7 +37,7 @@ import rubensandreoli.commons.utils.SwingUtils;
  * https://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-path-path
  * http://zetcode.com/tutorials/javaswingtutorial/draganddrop/
  */
-public class PathField extends javax.swing.JTextField{
+public class PathField extends javax.swing.JTextField{ //TODO: review
     private static final long serialVersionUID = 1L;
     
     public static final int FILES_ONLY = FileUtils.FILES_ONLY;
@@ -80,7 +80,6 @@ public class PathField extends javax.swing.JTextField{
             clear();
             return;
         }
-        path = FileUtils.normalize(path);
         if(!setText(new File(path))){
             throw new IllegalArgumentException(path+" is not a valid mode "+mode+" file");
         }

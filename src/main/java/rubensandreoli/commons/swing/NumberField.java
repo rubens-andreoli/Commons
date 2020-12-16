@@ -27,7 +27,7 @@ import java.awt.event.KeyEvent;
  * https://stackoverflow.com/questions/46343616/how-can-i-convert-a-char-to-int-in-java
  * https://stackoverflow.com/questions/4968323/java-parse-int-value-from-a-char
  */
-public class NumberField extends javax.swing.JTextField{
+public class NumberField extends javax.swing.JTextField{ //TODO: review
     private static final long serialVersionUID = 1L;
     
     public static final int DEFAULT_INITIAL_VALUE = 0;

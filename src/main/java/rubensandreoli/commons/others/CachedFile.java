@@ -94,7 +94,7 @@ public class CachedFile extends File{ //TODO: review
     
     @Override
     public String getParent() {
-        if(parent == null) parent = FileUtils.getParent(super.getPath());
+        if(parent == null) parent = super.getParent();
         return parent;
     }
     
@@ -104,7 +104,7 @@ public class CachedFile extends File{ //TODO: review
     
     @Override
     public String getName() {
-        if(name == null) name = FileUtils.getName(super.getPath());
+        if(name == null) name = super.getName();
         return name;
     }
     
@@ -124,8 +124,7 @@ public class CachedFile extends File{ //TODO: review
     }
     
     public String getSignature() {
-        byte[] rawSignature = getRawSignature();
-        return new String(rawSignature);
+        return new String(getRawSignature());
     }
     
     public byte[] getContent() {

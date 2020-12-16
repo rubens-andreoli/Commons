@@ -29,13 +29,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import rubensandreoli.commons.others.CachedFile;
@@ -49,8 +50,9 @@ import rubensandreoli.commons.others.CachedFile;
  * https://www.sparkhound.com/blog/detect-image-file-types-through-byte-arrays
  * https://stackoverflow.com/questions/27476845/what-is-the-difference-between-a-null-array-and-an-empty-array
  */
-public class FileUtils { //TODO: review
+public class FileUtils {
     
+    // <editor-fold defaultstate="collapsed" desc=" STATIC FIELDS ">
     public static final String IMAGES_REGEX = ".*\\.jpg|jpeg|bmp|png|gif";
     public static final String IMAGES_GLOB = "*.{jpg,jpeg,bmp,png,gif}";
     public static final HashSet<String> IMAGES_EXT = new HashSet<>();
@@ -62,14 +64,13 @@ public class FileUtils { //TODO: review
         IMAGES_EXT.add(".gif");
     }
     
-    public static final String EXTENSION_REGEX = "^.[a-z]{3,}$";
-    public static final String SEPARATOR = "/";
+    public static final String separator = File.separator;
+    public static final Pattern FOLDER_PATTERN = Pattern.compile("([^"+Matcher.quoteReplacement(separator)+"]*["+Matcher.quoteReplacement(separator)+"]+)");
+    public static final String FOLDER_INVALID_CHARS_REGEX = "[*?\"<>|]";
     public static final String FILENAME_INVALID_CHARS_REGEX = "[\\/\\\\:\\*?\\\"<\\>|]";
+    public static final String EXTENSION_REGEX = "^.[a-z]{3,}$";
+    public static final String EXTENSION_INVALID_CHARS_REGEX = "[^a-z-A-Z\\.]";
     public static final int MASKED_FILENAME_MIN_LENGTH = 5;
-    
-    public static final String FILENAME_MASK = "%s"+SEPARATOR+"%s%s";
-    public static final String SUBFOLDER_MASK = "%s"+SEPARATOR+"%s";
-    public static final String DUPLICATED_FILENAME_MASK = "%s"+SEPARATOR+"%s (%d)%s";
     public static final int FILEPATH_MAX_LENGTH = 255;
     
     public static final int DEFAULT_CONNECTION_TIMEOUT = 2000; //ms
@@ -79,51 +80,71 @@ public class FileUtils { //TODO: review
     public static final int FILES_ONLY = 0;
     public static final int DIRECTORIES_ONLY = 1;
     public static final int FILES_AND_DIRECTORIES = 2;
+    // </editor-fold>
 
     private FileUtils(){}
     
-    // <editor-fold defaultstate="collapsed" desc=" PARSE PATHNAME "> 
-    /**
-     * Replaces all separators with {@literal '/'} and returns a {@Code String} 
-     * containing the file or directory denoted by this abstract pathname.
-     * This is just the last name in the pathname's name sequence.
-     * 
-     * @param pathname abstract pathname from which the file/directory will be parsed
-     * @return last item of the pathname or an empty {@code String} if 
-          this pathname's name sequence is empty
-     */
+    // <editor-fold defaultstate="collapsed" desc=" PARSE PATHNAME ">
     public static String getName(String pathname){
-        final String name = getNode(pathname, 1);
-        return name.isEmpty()? pathname : name;
+        return new File(pathname).getName();
     }
     
     public static String getParentName(String pathname){
-        return getNode(pathname, 2);
+        return new File(pathname).getParentFile().getName();
     }
-    
-    public static String getParent(String pathname){
-        pathname = pathname.replaceAll("[/\\\\]", SEPARATOR).trim();
-        final int sepIndex = pathname.lastIndexOf(SEPARATOR);
-        if(sepIndex > 0) {
-            pathname = pathname.substring(0, sepIndex);
-            if(pathname.endsWith(":")) pathname += SEPARATOR;
-        }
-        return pathname;
-    }
-    
-//    public static String getRoot(String pathname){
-//        pathname = pathname.replaceAll("[/\\\\]", Matcher.quoteReplacement(SEPARATOR));
-//        final String[] tokens = pathname.split(Matcher.quoteReplacement(SEPARATOR));
-//        return tokens[0];
-//    }
 
-    public static String getNode(String pathname, int level) { //FIX: '//...' -> 'x/x/...' 'x' are not nodes
-        pathname = pathname.replaceAll("[/\\\\]", SEPARATOR);
-        final String[] tokens = pathname.split(SEPARATOR);
-        if(tokens.length >= level) return tokens[tokens.length-level];
-        return "";
+    public static String getParent(String pathname){
+        return new File(pathname).getParent();
     }
     
+    public static String getRoot(String pathname){
+        pathname = normalize(pathname);
+        final Matcher matcher = FOLDER_PATTERN.matcher(pathname);
+        final StringBuilder sb = new StringBuilder();
+        while(matcher.find()){
+            final String node = matcher.group(1);
+            sb.append(node);
+            if(!node.startsWith("http") && !node.startsWith(separator)) break;
+        }
+        if(sb.length() == 0) return null;
+        return sb.toString();    
+        
+        // <editor-fold defaultstate="collapsed" desc=" ALTERNATIVE ">
+//        final String[] tokens = pathname.split("[/\\\\]");
+//        if(tokens.length == 1) {
+//            if(!pathname.contains(".")) return tokens[0]+SEPARATOR;
+//            return null;
+//        }
+//        final StringBuilder sb = new StringBuilder();
+//        boolean found = false;
+//        int i = 0;
+//        for (String token : tokens) {
+//            if(token.isEmpty()){
+//                if(!found) sb.append(SEPARATOR);
+//            }else{
+//                if(!found){
+//                    sb.append(token);
+//                    if(!token.startsWith("http")) found = true;
+//                    else sb.append(SEPARATOR);
+//                }else{
+//                    break;
+//                }
+//            }
+//            i++;
+//        }
+//        if(found){ 
+//            if(i <= tokens.length)sb.append(SEPARATOR);
+//            return sb.toString();
+//        }else{
+//            return null;
+//        }
+        // </editor-fold>
+    }
+
+    public static String normalize(String pathname){
+        return new File(pathname).getPath();
+    }
+
     /**
      * Returns the name of the file or directory denoted by this abstract pathname,
  without any characters considered invalid by Windows OS.
@@ -196,45 +217,34 @@ public class FileUtils { //TODO: review
     }
     
     public static final String buildPathname(File root, String...nodes){
-        return buildPathname(root.getPath(), nodes);
+        for (String node : nodes) {
+            root = new File(root, node);
+        }
+        return root.getPath();
     }
 
     public static final String buildPathname(String root, String...nodes){
-        root = root.replaceAll("[/\\\\]", SEPARATOR);
-        if(nodes.length == 0) return root;
-        final StringBuilder sb = new StringBuilder(root);
-        if(root.endsWith(SEPARATOR)) sb.deleteCharAt(sb.length()-1);
-        for (String node : nodes) {
-            sb.append(SEPARATOR);
-            sb.append(node);
-        }
-        return sb.toString();
+        return buildPathname(new File(root), nodes);
     }
-    
-    public static String normalize(String pathname){
-        return pathname.replaceAll("[/\\\\]", SEPARATOR);
-    }
-    
+
     public static String maskPathname(String pathname, int maxLenght){
         if(pathname.isEmpty()) return "";
         pathname = normalize(pathname);
         if((maxLenght < MASKED_FILENAME_MIN_LENGTH) || (pathname.length() <= maxLenght)) return pathname;
-
-        String root = Path.of(pathname).getRoot().toString(); //TODO: implement FileUtils.getRoot(String pathname);
-        root = normalize(root);
         
         String formated = pathname.substring(pathname.length()-maxLenght, pathname.length());
-        formated = formated.replaceFirst("([^\\"+SEPARATOR
-                +"]{3}(?=\\"+SEPARATOR
-                +"))|(.{3})(?=[^\\"+SEPARATOR
+        formated = formated.replaceFirst("([^\\"+separator
+                +"]{3}(?=\\"+separator
+                +"))|(.{3})(?=[^\\"+separator
                 +"]*$)", "..."); //or only (.{3,}?(?=\/))|(.{3})
-        
+
+        String root = getRoot(pathname);
         if(root != null){
             formated = formated.replaceFirst(".{"+root.length()
                     +",}(\\.{3})|(^.{"+(root.length()+3)
-                    +",}?(?=\\"+SEPARATOR+"))", root+"..."); //if deparator is "\" Matcher.quoteReplacement(root)
-            int index = formated.indexOf(".");
-            if(index < root.length()) formated = formated.substring(index);
+                    +",}?(?=\\"+separator+"))", Matcher.quoteReplacement(root)+"..."); //if separator is "\" Matcher.quoteReplacement(root)
+            int index = formated.indexOf("..."+separator);
+            if(index < root.length()) formated = formated.substring(Math.max(0, index));
         }
 
         return formated;
@@ -257,16 +267,16 @@ public class FileUtils { //TODO: review
      */
     public static File createValidFile(File folder, String filename, String extension){
         //FIX INVALID CHARACTERS
-        filename = filename.replaceAll("[\\\\\\/:*?\"<>|]", "");
-        extension = extension.replaceAll("[^a-z-A-Z\\.]", "");
-        File file = new File(folder, String.format("%s%s", filename, extension));
-        
+        filename = filename.replaceAll(FILENAME_INVALID_CHARS_REGEX, "");
+        extension = extension.replaceAll(EXTENSION_INVALID_CHARS_REGEX, "");
+        File file = new File(folder, StringUtils.concat(filename, extension));
+
         //FIX FILEPATH LENGTH
         if(file.getAbsolutePath().length() > FILEPATH_MAX_LENGTH){
             int toRemove = file.getAbsolutePath().length() - FILEPATH_MAX_LENGTH;
             if(filename.length() > toRemove){
-                filename = filename.substring(0, filename.length()-toRemove); //TODO: check if removing 1 more than needed?
-                file = new File(String.format(FILENAME_MASK, folder, filename, extension));
+                filename = filename.substring(0, filename.length()-toRemove);
+                file = new File(StringUtils.concat(folder.getPath(), separator, filename, extension));
             }else{
                 return null;
             }
@@ -274,7 +284,7 @@ public class FileUtils { //TODO: review
 
         //FIX DUPLICATED NAME
         for(int n=1; file.exists(); n++){
-            file = new File(String.format(DUPLICATED_FILENAME_MASK, folder, filename, n, extension));
+            file = new File(StringUtils.concat(folder.getPath(), separator, filename, " (", String.valueOf(n), ")", extension));
         }
         return file;
     }
@@ -310,7 +320,7 @@ public class FileUtils { //TODO: review
      * @return valid {@code File} ready to be saved
      */
     public static File createValidFile(String folder, String filename, String extension){
-        folder = folder.replaceAll("[*?\"<>|]", "");
+        folder = folder.replaceAll(FOLDER_INVALID_CHARS_REGEX, "");
         return createValidFile(new File(folder), filename, extension);
     }
     
@@ -349,29 +359,23 @@ public class FileUtils { //TODO: review
         try{
             dest.mkdir();
         }catch(SecurityException ex){
-            System.err.println("ERROR: Failed creating folder "+dest.getPath());
             return false;
         }
         return moveFileTo(file, dest.getPath());
     }
-    
+
     public static boolean moveFileTo(File file, String folder){
-        return moveFileTo(new CachedFile(file), folder);
-    }
-    
-    public static boolean moveFileTo(CachedFile file, String folder){
-        if(!file.isFile()) throw new IllegalArgumentException("This method can only move files");
+        if(!file.isFile()) throw new IllegalArgumentException("This method cannot move directories");
         
         boolean moved = false;
-        File dest = new File(folder, file.getName());
+        File tempDest = new File(folder, file.getName());
         try{
-            moved = file.renameTo(dest);
+            moved = file.renameTo(tempDest);
             if(!moved){ //costly method only if failed above
-                dest = createValidFile(folder, file.getFilename(), file.getExtension());
-                moved = file.renameTo(dest);
+                tempDest = createValidFile(folder, file.getPath());
+                moved = file.renameTo(tempDest);
             }
         }catch(Exception ex){}
-        if(!moved) System.err.println("ERROR: Failed moving "+file.getAbsolutePath()+" to "+dest.getAbsolutePath());
         
         return moved;
     }
@@ -390,7 +394,6 @@ public class FileUtils { //TODO: review
         try{
             removed = file.delete();
         }catch(SecurityException ex){}
-        if(!removed) System.err.println("ERROR: Failed removing "+file.getPath());
         return removed;
     }
     
@@ -404,7 +407,6 @@ public class FileUtils { //TODO: review
                 created = root.mkdirs();
             }catch(SecurityException ex){}
             if(!created){
-                System.err.println("ERROR: Failed creating folder "+root.getPath());
                 return null; //couldn't create
             }
         }
@@ -414,13 +416,6 @@ public class FileUtils { //TODO: review
     public static File createFolder(String root, String...nodes){
         return createFolder(new File(root), nodes);
     }
-
-    @Deprecated
-    public static File createSubfolder(String parent, String child) throws IOException{ //TODO: teste ImageDownloader
-        final File folder = createFolder(parent, child);
-        if(folder == null) throw new IOException("Failed creating folder "+folder.getPath());
-        return folder;
-    }
     // </editor-fold>
       
     // <editor-fold defaultstate="collapsed" desc=" READ "> 
@@ -429,24 +424,6 @@ public class FileUtils { //TODO: review
             return file.length();
         }catch(SecurityException ex){
             return 0L;
-        }
-    }
-    
-    public static ImageIcon loadIcon(String url){
-        try{
-            return new ImageIcon(FileUtils.class.getClassLoader().getResource(url));
-        }catch(NullPointerException ex){
-            return new ImageIcon();
-        }
-    }
-    
-    public static ImageIcon loadIcon(String url, int size){
-        if(size < 1) throw new IllegalArgumentException();
-        try{
-            final Image i = new ImageIcon(FileUtils.class.getClassLoader().getResource(url)).getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT);
-            return new ImageIcon(i);
-        }catch(NullPointerException ex){
-            return null;
         }
     }
     
@@ -473,6 +450,24 @@ public class FileUtils { //TODO: review
             return null;
         }
     }
+        
+    public static ImageIcon loadIcon(String url){
+        try{
+            return new ImageIcon(FileUtils.class.getClassLoader().getResource(url));
+        }catch(NullPointerException ex){
+            return new ImageIcon();
+        }
+    }
+    
+    public static ImageIcon loadIcon(String url, int size){
+        if(size < 1) throw new IllegalArgumentException();
+        try{
+            final Image i = new ImageIcon(FileUtils.class.getClassLoader().getResource(url)).getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT);
+            return new ImageIcon(i);
+        }catch(NullPointerException ex){
+            return null;
+        }
+    }
     
     public BufferedImage loadImage(String path){
         try {
@@ -484,6 +479,10 @@ public class FileUtils { //TODO: review
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" SCAN FILESYSTEM "> 
+    public static List<File> scanChildren(File root){
+        return scanChildren(root, FILES_AND_DIRECTORIES, true);
+    }
+    
     public static List<File> scanChildren(File root, int mode){
         return scanChildren(root, mode, true);
     }
@@ -534,6 +533,10 @@ public class FileUtils { //TODO: review
         return files;
     }
 
+    public static List<File> listChildren(File root){
+        return listChildren(root, FILES_AND_DIRECTORIES, true);
+    }
+    
     public static List<File> listChildren(File root, int mode){
         return listChildren(root, mode, true);
     }
@@ -577,7 +580,7 @@ public class FileUtils { //TODO: review
     public static void downloadToFile(String url, CachedFile file) throws IOException{
         downloadToFile(url, file, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT, DEFAULT_BUFFER_SIZE);
     }
-    
+
     public static void downloadToFile(String url, CachedFile file, int connectionTimeout, int readTimeout) throws IOException{
         downloadToFile(url, file, connectionTimeout, readTimeout, DEFAULT_BUFFER_SIZE);
     }
@@ -599,7 +602,7 @@ public class FileUtils { //TODO: review
         }
     }
     
-    private static InputStream openInputStream(final URL path, int connectionTimeout, int readTimeout) throws IOException{
+    private static InputStream openInputStream(URL path, int connectionTimeout, int readTimeout) throws IOException{
         try {
             final var conn = path.openConnection();
             conn.setConnectTimeout(connectionTimeout);
@@ -610,7 +613,7 @@ public class FileUtils { //TODO: review
         }
     }
     
-    private static FileOutputStream openOutputStream(final File file) throws IOException {
+    private static FileOutputStream openOutputStream(File file) throws IOException {
         if (file.isDirectory()) {
             throw new IOException("File '"+file+"' is a directory");
         }else if (file.isFile() && !file.canWrite()) {
