@@ -37,7 +37,7 @@ import rubensandreoli.commons.utils.SwingUtils;
  * https://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-path-path
  * http://zetcode.com/tutorials/javaswingtutorial/draganddrop/
  */
-public class PathField extends javax.swing.JTextField{ //TODO: review
+public class PathField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
     
     public static final int FILES_ONLY = FileUtils.FILES_ONLY;
@@ -53,7 +53,7 @@ public class PathField extends javax.swing.JTextField{ //TODO: review
         this.mode = mode;
         this.length = length;
         setEditable(false);
-        addDropTarget();
+        setDragEnabled(true);
     }
 
     public PathField(int mode){
@@ -62,10 +62,6 @@ public class PathField extends javax.swing.JTextField{ //TODO: review
     
     public PathField(){
         this(FILES_AND_DIRECTORIES, 0);
-    }
-    
-    private void addDropTarget(){
-        SwingUtils.setDropTarget(this, file -> setText(file));
     }
 
     @Override
@@ -81,7 +77,7 @@ public class PathField extends javax.swing.JTextField{ //TODO: review
             return;
         }
         if(!setText(new File(path))){
-            throw new IllegalArgumentException(path+" is not a valid mode "+mode+" file");
+            throw new IllegalArgumentException("File "+path+" doesn't match set mode "+mode);
         }
     }
     
@@ -96,9 +92,7 @@ public class PathField extends javax.swing.JTextField{ //TODO: review
         }
         
         if(!validated){
-            if ((mode!=FILES_AND_DIRECTORIES) && 
-                        (mode==FILES_ONLY && !file.isFile()) ||
-                        (mode==DIRECTORIES_ONLY && !file.isDirectory())){
+            if ((mode!=FILES_AND_DIRECTORIES) && (mode==FILES_ONLY && !file.isFile()) || (mode==DIRECTORIES_ONLY && !file.isDirectory())){
                 return false;
             }
         }
@@ -125,7 +119,7 @@ public class PathField extends javax.swing.JTextField{ //TODO: review
     }
 
     public void setLenght(int length) {
-        if(length < MIN_LENGTH) throw new IllegalArgumentException("length "+length+" < "+MIN_LENGTH);
+        if(length < MIN_LENGTH) throw new IllegalArgumentException("Parameter length "+length+" < "+MIN_LENGTH);
         this.length = length;
         if(file != null) setText(file.getPath());
     }

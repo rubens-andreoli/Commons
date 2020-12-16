@@ -24,7 +24,7 @@ import java.util.Arrays;
 import rubensandreoli.commons.utils.FileUtils;
 import rubensandreoli.commons.utils.StringUtils;
 
-public class CachedFile extends File{ //TODO: review
+public class CachedFile extends File{
     private static final long serialVersionUID = 1L;
  
     public static final int SIGNATURE_BYTES = 4;
@@ -72,7 +72,7 @@ public class CachedFile extends File{ //TODO: review
     }
     
     public File toFile(){
-        return new File(this.getPath());
+        return new File(getPath());
     }
   
     // <editor-fold defaultstate="collapsed" desc=" GETTERS "> 
@@ -109,12 +109,12 @@ public class CachedFile extends File{ //TODO: review
     }
     
     public String getExtension() {
-        if(extension == null) extension = FileUtils.getExtension(super.getPath());
+        if(extension == null) extension = FileUtils.getExtension(getPath());
         return extension;
     }
     
     public String getFilename() {
-        if(filename == null) filename = FileUtils.getFilename(super.getPath());
+        if(filename == null) filename = FileUtils.getFilename(getPath());
         return filename;
     }
  

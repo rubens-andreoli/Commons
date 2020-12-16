@@ -33,14 +33,14 @@ import javax.swing.text.DefaultCaret;
  * https://www.baeldung.com/java-list-iterate-backwards
  * https://stackoverflow.com/questions/2483572/making-a-jscrollpane-automatically-scroll-all-the-way-down
  */
-public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
+public class RecycledTextArea extends javax.swing.JTextArea{
     private static final long serialVersionUID = 1L;
     
     public static final int DEFAULT_MAX_SIZE = 120;
     public static final int MIN_SIZE = 1;
     private static final String TOOLTIP = "<html><b>Double click</b> to <b>clear</b> texts.</html>";
     
-    private LinkedList<String> texts = new LinkedList<>();;
+    private LinkedList<String> texts = new LinkedList<>();
     private int size;
     private boolean inverted;
     
@@ -72,27 +72,23 @@ public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
     public RecycledTextArea() {
         this(DEFAULT_MAX_SIZE);
     }
-    
-    public void enableTooltip(boolean b){
-        if(b) setToolTipText(TOOLTIP);
-        else setToolTipText(null);
-    }
-
-    private void addWithoutPrinting(String text){
-        if(texts.size() > size){
-            texts.removeFirst();
-        }
-        texts.add(text);
-    }
 
     public void addText(String text){
         addWithoutPrinting(text);
         printTexts();
     }
     
+    private void addWithoutPrinting(String text){
+        if(texts.size() > size){
+            texts.removeFirst();
+        }
+        texts.add(text);
+    }
+    
     public boolean amendText(String text){
         if(texts.isEmpty()) return false;
         texts.set(texts.size()-1, text);
+        printTexts();
         return true;
     }
     
@@ -101,6 +97,8 @@ public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
         final int index = texts.size()-1;
         if(condition.test(texts.get(index))){
             texts.set(index, text);
+            printTexts();
+            return true;
         }
         return false;
     }
@@ -111,13 +109,17 @@ public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
         texts.add(text);
         printTexts();
     }
-    
-    public void clear(){
-        texts.clear();
-        super.setText("");
+        
+    public void setTexts(List<String> texts){
+        setWithoutPrint(texts);
+        printTexts();
+    }
+        
+    public void setWithoutPrint(List<String> texts){
+        texts.forEach(t -> addWithoutPrinting(t));
     }
     
-    private void printTexts(){
+    public void printTexts(){
         final StringBuilder sb = new StringBuilder();
         if(inverted){
             for (int i = texts.size(); i-- > 0; ) {
@@ -128,7 +130,16 @@ public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
         }
         super.setText(sb.toString());
     }
-    
+                
+    public void clear(){
+        texts.clear();
+        super.setText("");
+    }
+
+    public List<String> getTexts() {
+        return texts;
+    }
+        
     public void setSize(int size){
         this.size = size<MIN_SIZE? MIN_SIZE : size;
         while(texts.size() > this.size){
@@ -136,18 +147,14 @@ public class RecycledTextArea extends javax.swing.JTextArea{ //TODO: review
         }
     }
 
-    public List<String> getTexts() {
-        return texts;
-    }
-    
-    public void setTexts(List<String> texts){
-        texts.forEach(t -> addWithoutPrinting(t));
-        printTexts();
-    }
-
     public void setInverted(boolean inverted) {
         this.inverted = inverted;
         lockCaret(inverted);
+    }
+  
+    public void enableTooltip(boolean b){
+        if(b) setToolTipText(TOOLTIP);
+        else setToolTipText(null);
     }
     
     private void lockCaret(boolean b){
