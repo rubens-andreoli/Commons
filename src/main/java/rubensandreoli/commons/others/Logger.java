@@ -38,8 +38,8 @@ public class Logger {
     
     public static final Logger log = new Logger(); //eager initialization
     
-    private boolean enabled;
-    private boolean verbose;
+    private boolean enabled = true;
+    private boolean verbose = false;
     
     private Logger(){};
 

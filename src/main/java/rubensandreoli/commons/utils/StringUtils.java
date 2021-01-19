@@ -35,11 +35,12 @@ public class StringUtils {
      * 
      * @param s1 first {@code string} to compare
      * @param s2 second {@code string} to compare
-     * @param mode algorithm to be used
+     * @param method algorithm to be used
      * @return similarity ratio, between 0 and 1.0
+     * @throws IllegalArgumentException if method is invalid
      */
-    public static double compare(String s1, String s2, int mode){
-        switch(mode){
+    public static double compare(String s1, String s2, int method){
+        switch(method){
             case BAG_OF_WORDS:
                 return bagOfWords(s1, s2);
             case LEVENSHTEIN:
@@ -47,7 +48,7 @@ public class StringUtils {
             case DEMERAU:
                 return demerau(s1, s2);
             default:
-                return 0;
+                throw new IllegalArgumentException("Invalid comparison method");
        }
     }
     
@@ -207,7 +208,7 @@ public class StringUtils {
     public static int getNthIndexOf(String str, char c, int n, boolean reverse){
         if(n <= 0) return -1;
         if(reverse) str = new StringBuilder(str).reverse().toString();
-        int index = str.indexOf(c, 0);
+        int index = str.indexOf(c);
         while (n-- > 1 && index != -1){
             index = str.indexOf(c, index+1);
         }
