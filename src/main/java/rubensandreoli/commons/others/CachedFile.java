@@ -24,7 +24,15 @@ import java.util.Arrays;
 import rubensandreoli.commons.utils.FileUtils;
 import rubensandreoli.commons.utils.StringUtils;
 
-public class CachedFile extends File{
+/**
+ * Extends {@code File} too provide an alternative that reduces disk access or 
+ * repetitive processing by keeping previous sought information cached.<br>
+ * This class may cause memory leaks if not properly handled, use it with care.
+ * It may also keep information non longer relevant if the referenced file was changed.
+ * 
+ * @author Rubens A. Andreoli Jr.
+ */
+public class CachedFile extends File{ //TODO: keep this class or not?
     private static final long serialVersionUID = 1L;
  
     public static final int SIGNATURE_BYTES = 4;
@@ -54,6 +62,14 @@ public class CachedFile extends File{
         super(uri);
     }
 
+    /**
+     * Deletes the file or directory denoted by this abstract pathname.<br>
+     * If this pathname denotes a directory, then the directory must be empty in order to be deleted.<br>
+     * Note that this override does not throws an {@code SecurityException}.
+     * 
+     * @return {@code true} if and only if the file or directory is successfully deleted<br>
+     *         {@code false} otherwise
+     */
     @Override
     public boolean delete(){
         //don't use FileUtils#deleteFile or it will generate a circular reference
@@ -81,17 +97,7 @@ public class CachedFile extends File{
         if(size == null) size = FileUtils.getFileSize(this);
         return size;
     }
-    
-    public long chachedLength(){
-        long l = Long.BYTES;
-        if(signature != null) l += SIGNATURE_BYTES;
-        l += StringUtils.getStringSize(parent);
-        l += StringUtils.getStringSize(filename);
-        l += StringUtils.getStringSize(name);
-        l += StringUtils.getStringSize(extension);
-        return content!=null? length()+l : l;
-    }
-    
+
     @Override
     public String getParent() {
         if(parent == null) parent = super.getParent();

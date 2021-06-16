@@ -58,10 +58,10 @@ public class Logger {
      * @param ex exception to be logged, must not be {@code null}
      */
     public void print(Level lvl, String comment, Exception ex){
-        if(ex == null) return;
         if(!enabled) return;
-        if(!verbose && lvl.compareTo(lvl.ERROR) < 0) return;
-
+        if(ex == null || lvl == null) return;
+        if(!verbose && lvl.compareTo(Level.ERROR) < 0) return;
+        
         final StringBuilder trace = new StringBuilder();
         
         for (StackTraceElement e : ex.getStackTrace()) {
