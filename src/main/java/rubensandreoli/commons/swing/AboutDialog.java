@@ -22,12 +22,19 @@ import java.awt.Frame;
 import rubensandreoli.commons.utils.SwingUtils;
 import rubensandreoli.commons.utils.FileUtils;
 
-/** References:
- * https://stackoverflow.com/questions/51660856/open-a-browser-with-java
+/** 
+ * Creates a dialog that displays the program and its author information.<br>
+ * <br>
+ * References:<br>
+ * https://stackoverflow.com/questions/51660856/open-a-browser-with-java<br>
+ * https://stackoverflow.com/questions/222214/managing-constructors-with-many-parameters-in-java<br>
+ * https://stackoverflow.com/questions/1842223/java-linebreaks-in-jlabels
+ * 
+ * @author Rubens A. Andreoli Jr.
  */
 public class AboutDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 1L;
-
+    
     public static final String GNU_PUBLIC = "<html><body style=\"text-align:justify\">"
 	    + "This program is free software: you can redistribute it and/or modify "
 	    + "it under the terms of the GNU General Public License as published by "
@@ -40,9 +47,41 @@ public class AboutDialog extends javax.swing.JDialog {
 	    + "<p>You should have received a copy of the GNU General Public License "
 	    + "along with this program.  If not, see http://www.gnu.org/licenses.</p></body></html>";
     
+    // <editor-fold defaultstate="collapsed" desc=" PROGRAM INFO "> 
+    public static class ProgramInfo {
+       public final String name;
+       public final String description;
+       public final String version;
+       public final String year;
+
+        public ProgramInfo(String name, String description, String version, String year) {
+            this.name = name;
+            this.description = description;
+            this.version = version;
+            this.year = year;
+        }
+    }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" AUTHOR INFO "> 
+    public static class AuthorInfo {
+        public final String name;
+        public final String logo_path;
+        public final String site;
+        public final String donate_site;
+
+        public AuthorInfo(String name, String logo_path, String site, String donate_site) {
+            this.name = name;
+            this.logo_path = logo_path;
+            this.site = site;
+            this.donate_site = donate_site;
+        }
+    }
+    // </editor-fold>
+    
     private StringBuilder atributions;
     
-    public AboutDialog(Frame parent, String name, String description, String version, String year, String logo) {
+    public AboutDialog(Frame parent, ProgramInfo programInfo, AuthorInfo authorInfo) {
 	super(parent);
 	initComponents();
         
@@ -51,20 +90,29 @@ public class AboutDialog extends javax.swing.JDialog {
             setIconImage(parent.getIconImage());
         }
 
-        lblLogo.setIcon(FileUtils.loadIcon(logo));
-        lblProgram.setText(name);
-        lblVersion.setText("Version: "+ version);
-        if(description!=null) lblDescription.setText(description);
-        lblCopyright.setText("Copyright (C) "+year+"  Rubens A. Andreoli Junior");
+        lblLogo.setIcon(FileUtils.loadIcon(authorInfo.logo_path));
+        lblProgram.setText(programInfo.name);
+        lblVersion.setText("Version: "+ programInfo.version);
+        if(programInfo.description!=null){
+            lblDescription.setText("<html><p style=\"width:200px\">"+programInfo.description+"</p></html>");
+            pack();
+        }
+        lblCopyright.setText("Copyright (C) "+programInfo.year+" "+authorInfo.name);
         txpLicense.setText("<html><body style=\"text-align:justify\">"+GNU_PUBLIC+"</body></html>");
         txpLicense.setCaretPosition(0);
         
-        SwingUtils.addClickableLink(lblHere, "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Q5NUAPVCTC5U4&currency_code=USD&source=url");
-        SwingUtils.addClickableLink(lblLogo, "https://github.com/rubens-andreoli");
+        SwingUtils.addClickableLink(lblLogo, authorInfo.site);
+        SwingUtils.addClickableLink(lblHere, authorInfo.donate_site);
+
     }
     
-    public AboutDialog(Frame parent, String name, String version, String year){
-        this(parent, name, null, version, year, "images/logo.png");
+    public AboutDialog(Frame parent, ProgramInfo programInfo){
+        this(parent, programInfo, new AuthorInfo(
+                "Rubens A. Andreoli Junior", 
+                "images/logo.png", 
+                "https://github.com/rubens-andreoli", 
+                "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Q5NUAPVCTC5U4&currency_code=USD&source=url"
+        ));
     }
 
     @SuppressWarnings("unchecked")
@@ -88,7 +136,6 @@ public class AboutDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About");
-        setMaximumSize(new java.awt.Dimension(380, 336));
         setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
         setResizable(false);
 
@@ -98,7 +145,7 @@ public class AboutDialog extends javax.swing.JDialog {
 
         lblVersion.setFont(lblVersion.getFont());
 
-        lblDescription.setFont(lblDescription.getFont());
+        lblDescription.setFont(lblDescription.getFont().deriveFont(lblDescription.getFont().getStyle() & ~java.awt.Font.BOLD));
 
         lblCopyright.setFont(lblCopyright.getFont().deriveFont(lblCopyright.getFont().getSize()-2f));
 
@@ -128,7 +175,7 @@ public class AboutDialog extends javax.swing.JDialog {
                         .addGap(0, 0, 0)
                         .addComponent(lblVersion, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblDescription, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblDescription, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblCopyright, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 0, 0))
@@ -201,7 +248,7 @@ public class AboutDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlTop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlTop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sclLicense, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

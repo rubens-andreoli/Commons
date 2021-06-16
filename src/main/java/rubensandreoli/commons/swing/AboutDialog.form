@@ -4,9 +4,6 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="title" type="java.lang.String" value="About"/>
-    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[380, 336]"/>
-    </Property>
     <Property name="modalityType" type="java.awt.Dialog$ModalityType" editor="org.netbeans.modules.form.editors.EnumEditor">
       <Value id="DOCUMENT_MODAL"/>
     </Property>
@@ -47,7 +44,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="pnlTop" min="-2" max="-2" attributes="0"/>
+              <Component id="pnlTop" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="sclLicense" min="-2" pref="100" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -90,7 +87,7 @@
                           <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                           <Component id="lblVersion" min="-2" pref="15" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="lblDescription" min="-2" pref="25" max="-2" attributes="0"/>
+                          <Component id="lblDescription" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="lblCopyright" min="-2" pref="18" max="-2" attributes="0"/>
                       </Group>
@@ -128,7 +125,7 @@
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
               <FontInfo relative="true">
-                <Font component="lblDescription" property="font" relativeSize="true" size="0"/>
+                <Font bold="false" component="lblDescription" property="font" relativeSize="true" size="0"/>
               </FontInfo>
             </Property>
           </Properties>

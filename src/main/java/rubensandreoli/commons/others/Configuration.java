@@ -42,9 +42,10 @@ public class Configuration {
     
     public static final Configuration values = new Configuration(); //eager initialization;
 
-    private Properties p;
+    private final Properties p;
     private boolean changed;
     
+    @SuppressWarnings("OverridableMethodCallInConstructor")
     private Configuration(){
         p = new Properties();
         load();
