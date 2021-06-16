@@ -46,7 +46,7 @@ import rubensandreoli.commons.others.PickyConsumer;
 
 /**
  * References:
- * https://stackoverflow.com/questions/53419438/create-a-java-application-that-keeps-your-computer-from-going-idle-without-movin
+ * https://stackoverflow.com/questions/53419438/create-a-java-application-that-keeps-your-computer-from-going-idle-without-movin<br>
  * https://stackoverflow.com/questions/7814089/how-to-schedule-a-periodic-task-in-java
  * 
  * @author Rubens A. Andreoli Jr.
@@ -149,14 +149,14 @@ public class SwingUtils {
     }
     
     public static void keepAwake(boolean b) throws AWTException{
-        if(timer == null){
+        if(b){
             timer = Executors.newScheduledThreadPool(1);
             final Robot robot = new Robot();
             timer.scheduleAtFixedRate(() -> {
                 final Point point = MouseInfo.getPointerInfo().getLocation();
                 robot.mouseMove(point.x, point.y);
             }, TIMER_INTERVAL, TIMER_INTERVAL, TimeUnit.MINUTES);
-        }else if (!b){
+        }else if(timer != null){
             timer.shutdownNow();
             timer = null;
         }

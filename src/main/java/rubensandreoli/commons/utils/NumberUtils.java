@@ -20,6 +20,8 @@ package rubensandreoli.commons.utils;
 
 public class NumberUtils {
     
+    private NumberUtils(){}
+    
     /**
      * Parses the {@code String} argument as a signed decimal integer.<br>
      * Convenience method for {@code Integer::parseInt} that doesn't
@@ -74,7 +76,7 @@ public class NumberUtils {
      * @throws IllegalArgumentException if the higher bound is smaller or equal to the lower bound
      */
     public static int getRandomBetween(int min, int max){
-        if(max <= min) throw new IllegalArgumentException("Parameter max value must be bigger than min");
+        if(max <= min) throw new IllegalArgumentException("parameter max value must be bigger than min");
         return (int) (Math.random() * (max - min)) + min;
     }
 

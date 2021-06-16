@@ -48,7 +48,7 @@ public class StringUtils {
             case DEMERAU:
                 return demerau(s1, s2);
             default:
-                throw new IllegalArgumentException("Invalid comparison method");
+                throw new IllegalArgumentException("invalid comparison method");
        }
     }
     

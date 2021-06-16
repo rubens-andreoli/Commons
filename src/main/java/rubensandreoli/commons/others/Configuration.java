@@ -43,6 +43,7 @@ public class Configuration {
     public static final Configuration values = new Configuration(); //eager initialization;
 
     private final Properties p;
+    private File file;
     private boolean changed;
     
     @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -52,7 +53,7 @@ public class Configuration {
     }
     
     public boolean load(){
-        final File file = new File(FILENAME);
+        file = new File(FILENAME);
         if(file.isFile()){
             try(var bis = new BufferedInputStream(new FileInputStream(file))){
                 p.loadFromXML(bis);
@@ -170,7 +171,7 @@ public class Configuration {
      *         {@code false} otherwise
      */
     public boolean exists() {
-        return new File(FILENAME).isFile();
+        return file.isFile();
     }
 
 }

@@ -69,7 +69,7 @@ public class PathField extends javax.swing.JTextField{
 
     @Override
     public void setDragEnabled(boolean b) {
-        if(b) SwingUtils.setDropTarget(this, file -> setText(file));
+        if(b) SwingUtils.setDropTarget(this, f -> setText(f));
         else setDropTarget(null);
     }
 
