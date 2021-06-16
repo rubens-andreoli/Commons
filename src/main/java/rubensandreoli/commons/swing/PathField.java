@@ -24,18 +24,20 @@ import rubensandreoli.commons.utils.FileUtils;
 import rubensandreoli.commons.utils.SwingUtils;
 
 /** 
- * References:
- * https://stackoverflow.com/questions/5931261/java-use-stringbuilder-to-insert-at-the-beginning
- * https://stackoverflow.com/questions/12524826/why-should-i-use-deque-over-stack
- * https://stackoverflow.com/questions/196830/what-is-the-easiest-best-most-correct-way-to-iterate-through-the-characters-of-a
- * https://stackoverflow.com/questions/7569335/reverse-a-string-in-java
- * https://stackoverflow.com/questions/14189262/fitting-text-to-jtextfield-using
- * https://stackoverflow.com/questions/30987866/java-enforce-textfield-format-ux-00000000
- * https://docs.oracle.com/javase/tutorial/uiswing/components/formattedtextfield.html
- * https://stackoverflow.com/questions/8075373/path-separator-vs-filesystem-getseparator-vs-system-getpropertyfile-separato
- * https://stackoverflow.com/questions/58631724/paths-get-vs-path-of
- * https://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-path-path
+ * References:<br>
+ * https://stackoverflow.com/questions/5931261/java-use-stringbuilder-to-insert-at-the-beginning<br>
+ * https://stackoverflow.com/questions/12524826/why-should-i-use-deque-over-stack<br>
+ * https://stackoverflow.com/questions/196830/what-is-the-easiest-best-most-correct-way-to-iterate-through-the-characters-of-a<br>
+ * https://stackoverflow.com/questions/7569335/reverse-a-string-in-java<br>
+ * https://stackoverflow.com/questions/14189262/fitting-text-to-jtextfield-using<br>
+ * https://stackoverflow.com/questions/30987866/java-enforce-textfield-format-ux-00000000<br>
+ * https://docs.oracle.com/javase/tutorial/uiswing/components/formattedtextfield.html<br>
+ * https://stackoverflow.com/questions/8075373/path-separator-vs-filesystem-getseparator-vs-system-getpropertyfile-separato<br>
+ * https://stackoverflow.com/questions/58631724/paths-get-vs-path-of<br>
+ * https://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-path-path<br>
  * http://zetcode.com/tutorials/javaswingtutorial/draganddrop/
+ * 
+ * @author Rubens A. Andreoli Jr.
  */
 public class PathField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
@@ -49,6 +51,7 @@ public class PathField extends javax.swing.JTextField{
     private File file;
     private int length;
     
+    @SuppressWarnings("OverridableMethodCallInConstructor")
     public PathField(int mode, int length){
         this.mode = mode;
         this.length = length;
@@ -77,7 +80,7 @@ public class PathField extends javax.swing.JTextField{
             return;
         }
         if(!setText(new File(path))){
-            throw new IllegalArgumentException("File "+path+" doesn't match set mode "+mode);
+            throw new IllegalArgumentException("file "+path+" doesn't match set mode "+mode);
         }
     }
     
@@ -119,7 +122,7 @@ public class PathField extends javax.swing.JTextField{
     }
 
     public void setLenght(int length) {
-        if(length < MIN_LENGTH) throw new IllegalArgumentException("Parameter length "+length+" < "+MIN_LENGTH);
+        if(length < MIN_LENGTH) throw new IllegalArgumentException("parameter length "+length+" < "+MIN_LENGTH);
         this.length = length;
         if(file != null) setText(file.getPath());
     }
