@@ -21,6 +21,10 @@ package rubensandreoli.commons.swing;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JTextField;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.PlainDocument;
 
 /**
  * A text field that accepts only one key at a time, and displays a {@code String} describing said key.
@@ -31,56 +35,86 @@ public class KeyField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
 
     private int key;
+    private boolean write, pressed;
     
     public KeyField() {
+        ((PlainDocument) getDocument()).setDocumentFilter(new DocumentFilter(){
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                if(write) super.replace(fb, offset, length, text, attrs);
+            }
+ 
+            public @Override void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {}           
+            public @Override void remove(DocumentFilter.FilterBypass fb, int offset, int length) throws BadLocationException {}
+        });
+                
         addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                e.consume();
-            }
-            
-            @Override
-            public void keyPressed(KeyEvent e) {
-                clear();
+            public void keyPressed(KeyEvent e) {               
+                if(!pressed){
+                    pressed = true;
+                    setText(e.getExtendedKeyCode());
+                }
             }
             
             @Override
             public void keyReleased(KeyEvent e) {
-                setText(e.getKeyCode());
+                pressed = false;
             }
         });
         
         setHorizontalAlignment(JTextField.CENTER);
     }
 
+    /**
+     * Clears the field text and resets the associated key code;
+     * 
+     * @see JTextField#setText(String)
+     */
     public void clear(){
-        setText("");
+        key = 0;
+        setText(null);
     }
 
+    /**
+     * Gets the extended key code for the keyboard key set.
+     * 
+     * @return {@code 0} if no key is set;<br>
+     *         a positive integer otherwise
+     */
     public int getKey() {
         return key;
     }
 
     /**
-     * This method won't set the key code just the text to be displayed.
+     * This method won't set the key code just the text to be displayed.<br>
+     * A {@code null} parameter or an empty {@code String} will also not reset the key code, only the text.<br>
+     * Use of this method should be avoided.
      * 
      * @see KeyField#setText(int)
+     * @see KeyField#clear()
      * @param t {@code String} displayed by the field
      */
     @Override
     public void setText(String t) {
-        if(t.startsWith("Unk")) t = "Unknown";
+        write = true;
         super.setText(t);
+        write = false;
     }
     
     /**
-     * Sets the key code and text displayed by this field.
+     * Sets the key code and text displayed by this field.<br>
+     * Key codes with an Unknown string representation will be ignored.
      * 
      * @param keyCode integer value representing a keyboard key
      */
     public void setText(int keyCode){
-        key = keyCode;
-        setText(KeyEvent.getKeyText(keyCode));
+        clear();
+        final String t = KeyEvent.getKeyText(keyCode);
+        if(!t.startsWith("Unk")){
+            key = keyCode;
+            setText(t);
+        }
     }
     
 }
