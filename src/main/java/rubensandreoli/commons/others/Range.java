@@ -32,7 +32,7 @@ public class Range<T extends Number & Comparable>{
     
     public Range(T min, T max) {
         if(min.compareTo(max) >= 0) 
-            throw new IllegalArgumentException(min+" >= "+max);
+            throw new IllegalArgumentException("lower bound greater than upper: "+min+" >= "+max);
         this.min = min;
         this.max = max;
     }

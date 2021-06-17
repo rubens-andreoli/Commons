@@ -26,11 +26,11 @@ import java.util.function.Predicate;
 import javax.swing.text.DefaultCaret;
 
 /** 
- * References:
- * https://stackoverflow.com/questions/9580457/fifo-class-in-java
- * https://stackoverflow.com/questions/19050211/why-linkedlist-doesnt-have-initialcapacity-in-java
- * https://stackoverflow.com/questions/6961356/list-clear-vs-list-new-arraylistinteger
- * https://www.baeldung.com/java-list-iterate-backwards
+ * References:<br>
+ * https://stackoverflow.com/questions/9580457/fifo-class-in-java<br>
+ * https://stackoverflow.com/questions/19050211/why-linkedlist-doesnt-have-initialcapacity-in-java<br>
+ * https://stackoverflow.com/questions/6961356/list-clear-vs-list-new-arraylistinteger<br>
+ * https://www.baeldung.com/java-list-iterate-backwards<br>
  * https://stackoverflow.com/questions/2483572/making-a-jscrollpane-automatically-scroll-all-the-way-down
  */
 public class RecycledTextArea extends javax.swing.JTextArea{
