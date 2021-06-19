@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StringUtils {
+public final class StringUtils {
     
     public static final int BAG_OF_WORDS = 1;
     public static final int LEVENSHTEIN = 2;
@@ -77,7 +77,7 @@ public class StringUtils {
     }
     
     @SuppressWarnings("empty-statement")
-    public static Set<String> splitWords(String s){
+    private static Set<String> splitWords(String s){
 	s = s.replaceAll("('s)", "") //remove 's
             .replaceAll("[?!#%'(),]", "") //remove ? ! # % ' ( ) ,
             .replaceAll("[_\\-.]", " ") //replace _ - . for space
@@ -215,11 +215,4 @@ public class StringUtils {
         return (index == -1 || !reverse) ? index : (str.length()-1)-index;
     }
 
-    public static String concat(String...strings){
-        final StringBuilder sb = new StringBuilder();
-        for (String string : strings) {
-            sb.append(string);
-        }
-        return sb.toString();
-    }
 }

@@ -51,7 +51,7 @@ import rubensandreoli.commons.others.PickyConsumer;
  * 
  * @author Rubens A. Andreoli Jr.
  */
-public class SwingUtils {
+public final class SwingUtils {
     
     public static final int FILES_ONLY = FileUtils.FILES_ONLY;
     public static final int DIRECTORIES_ONLY = FileUtils.DIRECTORIES_ONLY;

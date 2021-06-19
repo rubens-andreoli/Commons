@@ -32,7 +32,7 @@ import rubensandreoli.commons.utils.StringUtils;
  * 
  * @author Rubens A. Andreoli Jr.
  */
-public class CachedFile extends File{ //TODO: keep this class or not?
+public class CachedFile extends File{
     private static final long serialVersionUID = 1L;
  
     public static final int SIGNATURE_BYTES = 4;

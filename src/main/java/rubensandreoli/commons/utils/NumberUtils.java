@@ -18,7 +18,7 @@
  */
 package rubensandreoli.commons.utils;
 
-public class NumberUtils {
+public final class NumberUtils {
     
     private NumberUtils(){}
     

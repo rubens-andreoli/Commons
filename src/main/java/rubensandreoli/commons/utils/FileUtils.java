@@ -18,6 +18,7 @@
  */
 package rubensandreoli.commons.utils;
 
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -42,19 +43,19 @@ import javax.swing.ImageIcon;
 import rubensandreoli.commons.others.CachedFile;
 
 /** 
- * References:
- * https://stackoverflow.com/questions/265769/maximum-name-length-in-ntfs-windows-xp-and-windows-vista#:~:text=14%20Answers&text=Individual%20components%20of%20a%20filename,files%2C%20248%20for%20folders).
- * https://stackoverflow.com/questions/57807466/what-is-the-maximum-filename-length-in-windows-10-java-would-try-catch-would
- * https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javadoc.html#@inheritDoc
- * https://examples.javacodegeeks.com/desktop-java/imageio/determine-format-of-an-image/
- * https://www.sparkhound.com/blog/detect-image-file-types-through-byte-arrays
+ * References:<br>
+ * https://stackoverflow.com/questions/265769/maximum-name-length-in-ntfs-windows-xp-and-windows-vista#:~:text=14%20Answers&text=Individual%20components%20of%20a%20filename,files%2C%20248%20for%20folders).<br>
+ * https://stackoverflow.com/questions/57807466/what-is-the-maximum-filename-length-in-windows-10-java-would-try-catch-would<br>
+ * https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javadoc.html#@inheritDoc<br>
+ * https://examples.javacodegeeks.com/desktop-java/imageio/determine-format-of-an-image/<br>
+ * https://www.sparkhound.com/blog/detect-image-file-types-through-byte-arrays<br>
  * https://stackoverflow.com/questions/27476845/what-is-the-difference-between-a-null-array-and-an-empty-array
  */
-public class FileUtils {
+public final class FileUtils {
     
     // <editor-fold defaultstate="collapsed" desc=" STATIC FIELDS ">
-    public static final String IMAGES_REGEX = ".*\\.jpg|jpeg|bmp|png|gif";
-    public static final String IMAGES_GLOB = "*.{jpg,jpeg,bmp,png,gif}";
+    public static final String IMAGES_REGEX = ".*\\.jpg|jpeg|bmp|png|gif|webp";
+    public static final String IMAGES_GLOB = "*.{jpg,jpeg,bmp,png,gif,webp}";
     public static final HashSet<String> IMAGES_EXT = new HashSet<>();
     static {
 	IMAGES_EXT.add(".jpg");
@@ -62,14 +63,15 @@ public class FileUtils {
 	IMAGES_EXT.add(".bmp");
 	IMAGES_EXT.add(".png");
         IMAGES_EXT.add(".gif");
+        IMAGES_EXT.add(".webp");
     }
     
     public static final String separator = File.separator;
-    public static final Pattern FOLDER_PATTERN = Pattern.compile("([^"+Matcher.quoteReplacement(separator)+"]*["+Matcher.quoteReplacement(separator)+"]+)");
-    public static final String FOLDER_INVALID_CHARS_REGEX = "[*?\"<>|]";
-    public static final String FILENAME_INVALID_CHARS_REGEX = "[\\/\\\\:\\*?\\\"<\\>|]";
-    public static final String EXTENSION_REGEX = "^.[a-z]{3,}$";
-    public static final String EXTENSION_INVALID_CHARS_REGEX = "[^a-z-A-Z\\.]";
+    private static final Pattern FOLDER_PATTERN = Pattern.compile("([^"+Matcher.quoteReplacement(separator)+"]*["+Matcher.quoteReplacement(separator)+"]+)");
+    private static final String FOLDER_INVALID_CHARS_REGEX = "[*?\"<>|]";
+    private static final String FILENAME_INVALID_CHARS_REGEX = "[\\/\\\\:\\*?\\\"<\\>|]";
+    private static final String EXTENSION_REGEX = "^.[a-z]{3,}$";
+    private static final String EXTENSION_INVALID_CHARS_REGEX = "[^a-z-A-Z\\.]";
     public static final int MASKED_FILENAME_MIN_LENGTH = 5;
     public static final int FILEPATH_MAX_LENGTH = 255;
     
@@ -85,16 +87,12 @@ public class FileUtils {
     private FileUtils(){}
     
     // <editor-fold defaultstate="collapsed" desc=" PARSE PATHNAME ">
-    public static String getName(String pathname){
-        return new File(pathname).getName();
-    }
-    
-    public static String getParentName(String pathname){
-        return new File(pathname).getParentFile().getName();
-    }
-
     public static String getParent(String pathname){
         return new File(pathname).getParent();
+    }
+
+    public static String getParentName(String pathname){
+        return new File(pathname).getParentFile().getName();
     }
     
     public static String getRoot(String pathname){
@@ -145,6 +143,10 @@ public class FileUtils {
         return new File(pathname).getPath();
     }
 
+    public static String getName(String pathname){
+        return new File(pathname).getName();
+    }
+    
     /**
      * Returns the name of the file or directory denoted by this abstract pathname,
  without any characters considered invalid by Windows OS.
@@ -155,7 +157,7 @@ public class FileUtils {
      *          characters; or an empty {@code String} if this pathname's name sequence is empty
      */
     public static String getFilename(String pathname){
-        return FileUtils.getFilename(pathname, true);
+        return getFilename(pathname, true);
     }
     
     /**
@@ -216,14 +218,14 @@ public class FileUtils {
         return getExtension(pathname, "");
     }
     
-    public static final String buildPathname(File root, String...nodes){
+    public static String buildPathname(File root, String...nodes){
         for (String node : nodes) {
             root = new File(root, node);
         }
         return root.getPath();
     }
 
-    public static final String buildPathname(String root, String...nodes){
+    public static String buildPathname(String root, String...nodes){
         return buildPathname(new File(root), nodes);
     }
 
@@ -269,14 +271,14 @@ public class FileUtils {
         //FIX INVALID CHARACTERS
         filename = filename.replaceAll(FILENAME_INVALID_CHARS_REGEX, "");
         extension = extension.replaceAll(EXTENSION_INVALID_CHARS_REGEX, "");
-        File file = new File(folder, StringUtils.concat(filename, extension));
+        File file = new File(folder, new StringBuilder(filename).append(extension).toString());
 
         //FIX FILEPATH LENGTH
         if(file.getAbsolutePath().length() > FILEPATH_MAX_LENGTH){
             int toRemove = file.getAbsolutePath().length() - FILEPATH_MAX_LENGTH;
             if(filename.length() > toRemove){
                 filename = filename.substring(0, filename.length()-toRemove);
-                file = new File(StringUtils.concat(folder.getPath(), separator, filename, extension));
+                file = new File(folder.getPath(), new StringBuilder(filename).append(extension).toString());
             }else{
                 return null;
             }
@@ -284,7 +286,9 @@ public class FileUtils {
 
         //FIX DUPLICATED NAME
         for(int n=1; file.exists(); n++){
-            file = new File(StringUtils.concat(folder.getPath(), separator, filename, " (", String.valueOf(n), ")", extension));
+            file = new File(folder.getPath(), new StringBuilder(filename)
+                            .append(" (").append(String.valueOf(n)).append(")")
+                            .append(extension).toString());
         }
         return file;
     }
@@ -302,7 +306,7 @@ public class FileUtils {
      * @return valid {@code File} ready to be saved
      */
     public static File createValidFile(File folder, String file){
-        return createValidFile(folder, FileUtils.getFilename(file), getExtension(file));
+        return createValidFile(folder, getFilename(file), getExtension(file));
     }
 
     /**
@@ -337,7 +341,7 @@ public class FileUtils {
      * @return valid {@code File} ready to be saved
      */
     public static File createValidFile(String folder, String file){
-        return createValidFile(folder, FileUtils.getFilename(file), getExtension(file));
+        return createValidFile(folder, getFilename(file), getExtension(file));
     }
     // </editor-fold>
  
@@ -365,8 +369,6 @@ public class FileUtils {
     }
 
     public static boolean moveFileTo(File file, String folder){
-        if(!file.isFile()) throw new IllegalArgumentException("This method cannot move directories");
-        
         boolean moved = false;
         File tempDest = new File(folder, file.getName());
         try{
@@ -394,6 +396,16 @@ public class FileUtils {
         try{
             removed = file.delete();
         }catch(SecurityException ex){}
+        return removed;
+    }
+    
+    public static boolean removeFile(File file){
+        boolean removed = false;
+        if(Desktop.isDesktopSupported()){
+            try{
+                removed = Desktop.getDesktop().moveToTrash(file);
+            }catch(Exception e){}
+        }
         return removed;
     }
     

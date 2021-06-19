@@ -20,7 +20,7 @@ package rubensandreoli.commons.utils;
 
 import rubensandreoli.commons.exceptions.CastException;
 
-public class BooleanUtils {
+public final class BooleanUtils {
     
     private BooleanUtils(){};
     

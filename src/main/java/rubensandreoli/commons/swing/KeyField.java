@@ -20,6 +20,9 @@ package rubensandreoli.commons.swing;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -36,6 +39,7 @@ public class KeyField extends javax.swing.JTextField{
 
     private int key;
     private boolean write, pressed;
+    private Set<Integer> blacklist;
     
     public KeyField() {
         ((PlainDocument) getDocument()).setDocumentFilter(new DocumentFilter(){
@@ -53,7 +57,8 @@ public class KeyField extends javax.swing.JTextField{
             public void keyPressed(KeyEvent e) {               
                 if(!pressed){
                     pressed = true;
-                    setText(e.getExtendedKeyCode());
+                    final int tmpKey = e.getExtendedKeyCode();
+                    if(blacklist == null || !blacklist.contains(tmpKey)) setText(tmpKey);
                 }
             }
             
@@ -115,6 +120,33 @@ public class KeyField extends javax.swing.JTextField{
             key = keyCode;
             setText(t);
         }
+    }
+
+    public void addBlacklisted(int...keyCode){
+        if(blacklist == null) blacklist = new HashSet<>();
+        for (int i : keyCode) blacklist.add(i);
+    }
+    
+    public void removeBlacklisted(int keyCode){
+        if(blacklist != null){
+            blacklist.remove(keyCode);
+            if(blacklist.isEmpty()) blacklist = null;
+        }
+    }
+    
+    public void clearBlacklist(){
+        blacklist = null;
+    }
+    
+    public Set<String> getBlacklistNames(){
+        if(blacklist == null) return null;
+        final Set<String> names = new HashSet<>();
+        blacklist.forEach(keyCode -> names.add(KeyEvent.getKeyText(keyCode)));
+        return names;
+    }
+    
+    public Set<Integer> getBlacklist(){
+        return blacklist;
     }
     
 }
