@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import rubensandreoli.commons.exceptions.UnsupportedException;
 import rubensandreoli.commons.others.CachedFile;
 
 /** 
@@ -399,14 +401,21 @@ public final class FileUtils {
         return removed;
     }
     
-    public static boolean removeFile(File file){
-        boolean removed = false;
+    public static boolean removeFile(File file) throws UnsupportedException {
         if(Desktop.isDesktopSupported()){
-            try{
-                removed = Desktop.getDesktop().moveToTrash(file);
-            }catch(Exception e){}
+            final Desktop d = Desktop.getDesktop();
+            if(d.isSupported(Desktop.Action.MOVE_TO_TRASH)){
+                try{
+                    return d.moveToTrash(file);
+                }catch(IllegalArgumentException|SecurityException ex){ //file not found or no access
+                    return false;
+                }
+            }else{
+                throw new UnsupportedException("move to trash action not supported");
+            }
+        }else{
+            throw new UnsupportedException("current platform doesn't support desktop class");
         }
-        return removed;
     }
     
     public static File createFolder(File root, String...nodes){
@@ -437,6 +446,17 @@ public final class FileUtils {
         }catch(SecurityException ex){
             return 0L;
         }
+    }
+    
+    public static String getFormattedFileSize(File file){
+        return formatFilesize(getFileSize(file));
+    }
+    
+    public static String formatFilesize(long size) {
+        if(size <= 0) return "0";
+        final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" }; //TODO: remove from here
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
     
     public static byte[] readAllBytes(File file){
@@ -481,9 +501,9 @@ public final class FileUtils {
         }
     }
     
-    public BufferedImage loadImage(String path){
+    public static BufferedImage loadImage(String url){
         try {
-            return ImageIO.read(new File(path));
+            return ImageIO.read(FileUtils.class.getResource(url));
         } catch (IOException ex) {
             return null;
         }

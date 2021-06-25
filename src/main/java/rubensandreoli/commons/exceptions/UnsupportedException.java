@@ -16,17 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package rubensandreoli.commons.swing.filters;
+package rubensandreoli.commons.exceptions;
 
-public interface FieldFilter {
-    
-    boolean shouldAdd(String text, String add, int offset, int length);
-    boolean shouldRemove(String text, int offset, int length);
-    
-    String retrieveReplacementText();
+public class UnsupportedException extends Exception{
+    private static final long serialVersionUID = 1L;
 
-    default String formatFocusLost(String text){
-        return null;
+    public UnsupportedException() {}
+
+    public UnsupportedException(String message) {
+        super(message);
     }
-    
+
+    public UnsupportedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public UnsupportedException(Throwable cause) {
+        super(cause);
+    } 
 }

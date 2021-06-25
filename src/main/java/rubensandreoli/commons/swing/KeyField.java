@@ -20,8 +20,8 @@ package rubensandreoli.commons.swing;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
@@ -37,6 +37,8 @@ import javax.swing.text.PlainDocument;
 public class KeyField extends javax.swing.JTextField{
     private static final long serialVersionUID = 1L;
 
+    private static final String BLACKLIST_TOOTIP_TITLE = "<b>Blacklisted: </b>";
+    
     private int key;
     private boolean write, pressed;
     private Set<Integer> blacklist;
@@ -132,6 +134,28 @@ public class KeyField extends javax.swing.JTextField{
             blacklist.remove(keyCode);
             if(blacklist.isEmpty()) blacklist = null;
         }
+    }
+    
+    public void buildTooltipText(String prefix){
+        if(blacklist == null) return;
+        
+        StringBuilder sb = new StringBuilder();
+        if(prefix != null){
+            if(prefix.endsWith("</html>")) sb.append(prefix.substring(0, prefix.length()-7));
+            else sb.append("<html>").append(prefix);
+            sb.append("<br>");
+        }else{
+            sb.append("<html>");
+        }
+        
+        sb.append(BLACKLIST_TOOTIP_TITLE);
+        final Iterator<Integer> it = blacklist.iterator();
+        if (it.hasNext()) { //not needed
+            sb.append(KeyEvent.getKeyText(it.next()));
+            while(it.hasNext()) sb.append(", ").append(KeyEvent.getKeyText(it.next()));
+        }
+        sb.append("</html>");
+        setToolTipText(sb.toString());
     }
     
     public void clearBlacklist(){

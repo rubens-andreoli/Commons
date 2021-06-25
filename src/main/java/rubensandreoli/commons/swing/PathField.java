@@ -35,7 +35,8 @@ import rubensandreoli.commons.utils.SwingUtils;
  * https://stackoverflow.com/questions/8075373/path-separator-vs-filesystem-getseparator-vs-system-getpropertyfile-separato<br>
  * https://stackoverflow.com/questions/58631724/paths-get-vs-path-of<br>
  * https://stackoverflow.com/questions/811248/how-can-i-use-drag-and-drop-in-swing-to-get-path-path<br>
- * http://zetcode.com/tutorials/javaswingtutorial/draganddrop/
+ * http://zetcode.com/tutorials/javaswingtutorial/draganddrop/<br>
+ * https://stackoverflow.com/questions/304932/jfilechooser-hangs-sometimes
  * 
  * @author Rubens A. Andreoli Jr.
  */
@@ -47,7 +48,7 @@ public class PathField extends javax.swing.JTextField{
     public static final int FILES_AND_DIRECTORIES = FileUtils.FILES_AND_DIRECTORIES;
     public static final int MIN_LENGTH = FileUtils.MASKED_FILENAME_MIN_LENGTH;
     
-    private final int mode;
+    private int mode;
     private File file;
     private int length;
     
@@ -75,11 +76,9 @@ public class PathField extends javax.swing.JTextField{
 
     @Override
     public void setText(String path){
-        if(path == null) {
+        if(path == null || path.isBlank()) {
             clear();
-            return;
-        }
-        if(!setText(new File(path))){
+        }else if(!setText(new File(path))){
             throw new IllegalArgumentException("file "+path+" doesn't match set mode "+mode);
         }
     }
@@ -114,6 +113,11 @@ public class PathField extends javax.swing.JTextField{
     public void clear(){
         super.setText("");
         file = null;
+    }
+    
+    public void setMode(int mode){
+        clear();
+        this.mode = mode;
     }
     
     @Override

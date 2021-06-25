@@ -38,8 +38,11 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import rubensandreoli.commons.others.Level;
 import rubensandreoli.commons.others.Logger;
 import rubensandreoli.commons.others.PickyConsumer;
@@ -146,6 +149,11 @@ public final class SwingUtils {
     
     public static void showMessageDialog(Component parent, Exception ex, Level lvl, boolean beep){
         showMessageDialog(parent, ex.getMessage(), "An exception has occurred!", lvl, beep);
+    }
+    
+    public static void registerKeyAction(JComponent c, String name, int key, AbstractAction action){
+        c.getActionMap().put(name, action);
+        c.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(key, 0), name);
     }
     
     public static void keepAwake(boolean b) throws AWTException{

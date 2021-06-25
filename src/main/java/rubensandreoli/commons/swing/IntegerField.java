@@ -16,35 +16,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package rubensandreoli.commons.swing.filters;
+package rubensandreoli.commons.swing;
 
-public class LengthFilter extends AbstractFieldFilter{
+public class IntegerField extends IntervalField<Integer>{
 
-    private int minLegth, maxLength;
-
-    public LengthFilter(int minLegth, int maxLength) {
-        if(minLegth >= maxLength) 
-            throw new IllegalArgumentException("lower bound greater than upper: "+minLegth+" >= "+maxLength);
-        this.minLegth = minLegth;
-        this.maxLength = maxLength;
+    public IntegerField(){
+        this(0,0);
     }
-
-    public LengthFilter(int maxLength) {
-        this(0, maxLength);
-    }
- 
-    @Override
-    protected boolean isValid(String text) {
-        return text.length() <= maxLength;
-    }
-
-    @Override
-    public String formatFocusLost(String text) {
-        if(text.length() < minLegth){
-            if(getDefaultText() == null) return "";
-            else return getDefaultText();
-        }
-        return null;
-    } 
     
+    public IntegerField(Integer min, Integer max) {
+        super(min, max);
+    }
+
+    @Override
+    protected Integer parseValue(String number) {
+        try{
+            return Integer.parseInt(number);
+        }catch(NumberFormatException ex){
+            return null;
+        }
+    }
+
+    @Override
+    protected String formatValue(Integer value) {
+        return String.valueOf(value);
+    }
+
 }
